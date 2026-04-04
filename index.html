@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bunetto | Premium Burgers</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 400: '#D4AF37', 500: '#BF953F', 600: '#AA771C' },
+                        dark: '#050505',
+                        surface: '#111111',
+                        surfaceLight: '#1a1a1a'
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 4px; }
+
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .text-gold-gradient {
+            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        .bg-gold-gradient {
+            background: linear-gradient(135deg, #BF953F 0%, #D4AF37 50%, #AA771C 100%);
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal-text.active { opacity: 1; transform: translateY(0); }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .floating-element { animation: float 6s ease-in-out infinite; }
+
+        /* --- CAROUSEL STYLES --- */
+        .carousel-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            gap: 1.5rem;
+            align-items: center;
+            scroll-behavior: smooth;
+        }
+        .carousel-track::-webkit-scrollbar { display: none; }
+        
+        /* Math to perfectly center cards */
+        .carousel-track::before,
+        .carousel-track::after {
+            content: '';
+            /* 120px is half of the mobile card width (240px) */
+            flex: 0 0 calc(50vw - 120px); 
+        }
+        @media (min-width: 768px) {
+            .carousel-track::before,
+            .carousel-track::after {
+                /* 160px is half of the desktop card width (320px) */
+                flex: 0 0 calc(50vw - 160px); 
+            }
+        }
+        
+        .carousel-item-wrap {
+            scroll-snap-align: center;
+            flex-shrink: 0;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            transform: scale(0.85);
+            filter: blur(4px);
+            opacity: 0.5;
+            pointer-events: none; 
+        }
+        
+        .carousel-item-wrap.active {
+            transform: scale(1);
+            filter: blur(0px);
+            opacity: 1;
+            pointer-events: auto; 
+            z-index: 10;
+        }
+
+        .menu-card img { transition: transform 0.6s ease; }
+        .carousel-item-wrap.active .menu-card:hover img { transform: scale(1.08) rotate(2deg); }
+
+        /* --- ANIMATIONS FOR CART --- */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.35); }
+            100% { transform: scale(1); }
+        }
+        .animate-badge-pop {
+            animation: pop 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
+        }
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            font-weight: bold;
+            color: #D4AF37;
+            font-size: 1.25rem;
+            z-index: 9999;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            animation: floatUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Modals & Nav */
+        .backdrop { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .backdrop.active { opacity: 1; pointer-events: auto; }
+        #cart-drawer { transform: translateX(100%); transition: transform 0.4s ease-in-out; }
+        #cart-drawer.active { transform: translateX(0); }
+        #view-all-modal { transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.5, 0, 0, 1); }
+        #view-all-modal.active { transform: translateY(0); }
+        
+        .nav-scrolled {
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-gold-500 selection:text-dark">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-40 transition-all duration-300 py-4">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center">
+            <a href="#" class="text-3xl font-serif font-bold tracking-wider text-gold-gradient">BUNETTO.</a>
+
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#best-sellers" class="text-sm tracking-widest uppercase hover:text-gold-400 transition-colors">Top Picks</a>
+                <a href="#menu-burgers" class="text-sm tracking-widest uppercase hover:text-gold-400 transition-colors">Menu</a>
+                <a href="#menu-beverages" class="text-sm tracking-widest uppercase hover:text-gold-400 transition-colors">Drinks</a>
+            </div>
+
+            <button onclick="toggleCart()" class="relative p-2 group bg-surfaceLight rounded-full border border-white/10 hover:border-gold-400/50 transition-all shadow-lg active:scale-95">
+                <svg width="24" height="24" viewBox="0 0 256 256" class="text-white group-hover:text-gold-400 transition-colors"><path fill="currentColor" d="M216 64h-40v-8a48 48 0 0 0-96 0v8H40a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16Zm-120-8a32 32 0 0 1 64 0v8H96Zm120 152H40V80h176v128Zm-88-72a32 32 0 0 1-32-32a8 8 0 0 1 16 0a16 16 0 0 0 32 0a8 8 0 0 1 16 0a32 32 0 0 1-32 32Z"/></svg>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-gold-400 text-dark text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center transform scale-0 transition-transform duration-300">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-dark z-10 opacity-70"></div>
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gold-500 rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gold-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
+            <div class="text-center md:text-left">
+                <p class="text-gold-400 tracking-[0.2em] text-sm uppercase mb-4 reveal-text">Taste the Luxury</p>
+                <h1 class="text-5xl md:text-7xl font-serif font-bold leading-tight mb-6 reveal-text" style="transition-delay: 0.1s;">
+                    The Golden<br>Standard of <span class="text-gold-gradient italic">Burgers.</span>
+                </h1>
+                <p class="text-gray-400 text-lg mb-8 max-w-md mx-auto md:mx-0 reveal-text" style="transition-delay: 0.2s;">
+                    Handcrafted perfection using the finest beef, artisanal buns, and pure culinary passion.
+                </p>
+                <div class="reveal-text flex flex-col sm:flex-row gap-4 justify-center md:justify-start" style="transition-delay: 0.3s;">
+                    <a href="#menu-burgers" class="bg-gold-gradient text-dark font-bold px-8 py-4 rounded-none uppercase tracking-widest text-sm flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(212,175,55,0.2)] hover:scale-105 transition-transform">
+                        Explore Menu
+                    </a>
+                </div>
+            </div>
+            <div class="relative hidden md:block">
+                <div class="relative w-full aspect-square flex items-center justify-center">
+                    <div class="absolute inset-0 bg-gold-500 rounded-full opacity-10 filter blur-[60px] animate-pulse"></div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1500&auto=format&fit=crop" 
+                         alt="Premium Burger" 
+                         class="w-[85%] h-[85%] object-cover rounded-full shadow-[0_0_50px_rgba(212,175,55,0.15)] floating-element border-4 border-surfaceLight">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Best Sellers Section -->
+    <section id="best-sellers" class="py-24 bg-surface relative border-t border-white/5">
+        <div class="max-w-4xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 reveal-text">
+                <p class="text-gold-400 tracking-[0.2em] text-sm uppercase mb-2">Crowd Favorites</p>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold">Best <span class="text-gold-gradient italic">Sellers</span></h2>
+                <div class="w-16 h-1 bg-gold-gradient mx-auto mt-6"></div>
+            </div>
+            
+            <div class="relative rounded-3xl p-1 overflow-hidden group shadow-[0_0_50px_rgba(212,175,55,0.1)] bg-dark">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,175,55,0.2),_rgba(5,5,5,1)_65%)] z-0 transition-opacity duration-700"></div>
+                <div class="relative z-10 bg-surface/40 backdrop-blur-xl rounded-[22px] p-4 md:p-8 border border-white/10 flex flex-col">
+                    <div id="list-bestsellers" class="flex flex-col"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Categories -->
+    <div class="bg-dark relative py-10">
+        
+        <!-- Section: Burgers -->
+        <section id="menu-burgers" class="py-16 relative">
+            <div class="max-w-7xl mx-auto px-4 lg:px-8">
+                <div class="flex justify-between items-end mb-10 border-b border-white/5 pb-4 reveal-text">
+                    <div>
+                        <p class="text-gold-400 tracking-[0.2em] text-xs uppercase mb-1">Signature & Smash</p>
+                        <h2 class="text-3xl md:text-4xl font-serif font-bold text-white">Premium <span class="text-gold-gradient italic">Burgers</span></h2>
+                    </div>
+                    <button onclick="openViewAll('burgers')" class="text-gold-400 uppercase text-xs tracking-widest font-semibold hover:text-white transition-colors flex items-center gap-1 group">
+                        View All
+                        <svg width="16" height="16" viewBox="0 0 256 256" class="transform group-hover:translate-x-1 transition-transform"><path fill="currentColor" d="M221.66 133.66l-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32Z"/></svg>
+                    </button>
+                </div>
+
+                <div class="relative w-[100vw] -ml-[50vw] left-1/2 py-4">
+                    <!-- Solid Gold Left Arrow -->
+                    <button onclick="scrollCarousel('burgers', -1)" class="absolute left-2 md:left-[5vw] lg:left-[10vw] top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold-gradient text-dark flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] active:scale-90 transition-transform">
+                        <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg>
+                    </button>
+
+                    <div id="track-burgers" class="carousel-track"></div>
+
+                    <!-- Solid Gold Right Arrow -->
+                    <button onclick="scrollCarousel('burgers', 1)" class="absolute right-2 md:right-[5vw] lg:right-[10vw] top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold-gradient text-dark flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] active:scale-90 transition-transform">
+                        <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128L90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Sides & Pasta -->
+        <section id="menu-sides" class="py-16 relative border-t border-white/5">
+            <div class="max-w-7xl mx-auto px-4 lg:px-8">
+                <div class="flex justify-between items-end mb-10 border-b border-white/5 pb-4 reveal-text">
+                    <div>
+                        <p class="text-gold-400 tracking-[0.2em] text-xs uppercase mb-1">Craving More</p>
+                        <h2 class="text-3xl md:text-4xl font-serif font-bold text-white">Sides & <span class="text-gold-gradient italic">Pasta</span></h2>
+                    </div>
+                    <button onclick="openViewAll('sides')" class="text-gold-400 uppercase text-xs tracking-widest font-semibold hover:text-white transition-colors flex items-center gap-1 group">
+                        View All
+                        <svg width="16" height="16" viewBox="0 0 256 256" class="transform group-hover:translate-x-1 transition-transform"><path fill="currentColor" d="M221.66 133.66l-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32Z"/></svg>
+                    </button>
+                </div>
+
+                <div class="relative w-[100vw] -ml-[50vw] left-1/2 py-4">
+                    <button onclick="scrollCarousel('sides', -1)" class="absolute left-2 md:left-[5vw] lg:left-[10vw] top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold-gradient text-dark flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] active:scale-90 transition-transform">
+                        <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg>
+                    </button>
+
+                    <div id="track-sides" class="carousel-track"></div>
+
+                    <button onclick="scrollCarousel('sides', 1)" class="absolute right-2 md:right-[5vw] lg:right-[10vw] top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold-gradient text-dark flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] active:scale-90 transition-transform">
+                        <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128L90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Beverages -->
+        <section id="menu-beverages" class="py-24 bg-surface relative border-t border-white/5">
+            <div class="max-w-4xl mx-auto px-6 lg:px-8">
+                <div class="text-center mb-16 reveal-text">
+                    <p class="text-gold-400 tracking-[0.2em] text-sm uppercase mb-2">Refreshments</p>
+                    <h2 class="text-4xl md:text-5xl font-serif font-bold">Cold <span class="text-gold-gradient italic">Beverages</span></h2>
+                    <div class="w-16 h-1 bg-gold-gradient mx-auto mt-6"></div>
+                </div>
+                <div class="bg-dark border border-white/10 rounded-xl p-4 md:p-8 shadow-2xl">
+                    <div id="list-beverages" class="flex flex-col"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-surfaceLight pt-20 pb-10 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-12 mb-16 text-center md:text-left">
+                <div>
+                    <h4 class="text-3xl font-serif font-bold text-gold-gradient mb-4">BUNETTO.</h4>
+                    <p class="text-gray-400 text-sm mb-6 max-w-xs mx-auto md:mx-0 leading-relaxed">Redefining fast food. Elevating the burger experience through uncompromising quality and luxury ingredients.</p>
+                </div>
+                <div>
+                    <h4 class="font-serif text-xl mb-6 text-white">Visit Us</h4>
+                    <p class="text-gray-400 text-sm mb-2">Food District</p>
+                    <p class="text-gray-400 text-sm mb-6">Pakistan</p>
+                    <p class="text-gold-400 text-sm font-semibold">Open Daily: 12 PM - 12 AM</p>
+                </div>
+                <div>
+                    <h4 class="font-serif text-xl mb-6 text-white">Contact</h4>
+                    <p class="text-gray-400 text-sm mb-2">Order Now via WhatsApp</p>
+                    <a href="https://wa.me/923012343423" target="_blank" class="text-gold-400 text-2xl font-serif hover:text-white transition-colors block mb-4">+92 301 2343423</a>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center">
+                <p class="text-gray-500 text-xs tracking-wider">&copy; 2026 Bunetto Premium Burgers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Drawer Overlays & UI -->
+    <div id="cart-backdrop" class="backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50" onclick="toggleCart()"></div>
+    
+    <div id="cart-drawer" class="fixed top-0 right-0 w-full md:w-[450px] h-full bg-surfaceLight border-l border-white/10 z-50 flex flex-col shadow-2xl">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-dark">
+            <h2 class="text-2xl font-serif text-gold-gradient">Your Order</h2>
+            <button onclick="toggleCart()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
+            </button>
+        </div>
+
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+
+        <div class="p-6 border-t border-white/10 bg-dark shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+            <!-- Order Type Selection -->
+            <div class="mb-4">
+                <label class="text-gray-400 text-xs uppercase tracking-widest mb-2 block">Order Type</label>
+                <div class="relative">
+                    <select id="order-type" onchange="updateCartUI()" class="w-full bg-surfaceLight border border-white/10 text-white rounded-md p-3 pr-10 text-sm outline-none focus:border-gold-400 transition-colors cursor-pointer appearance-none">
+                        <option value="pickup">Pickup (Free)</option>
+                        <option value="delivery">Delivery (+Rs. 150)</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-400">
+                        <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80A8 8 0 0 1 53.66 90.34L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optional Delivery Fee Row -->
+            <div id="delivery-fee-row" class="flex justify-between items-center mb-2 hidden">
+                <span class="text-gray-400 text-sm">Delivery Fee</span>
+                <span class="text-white text-sm font-bold">Rs. 150</span>
+            </div>
+
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-gray-400 uppercase text-xs tracking-widest">Total Amount</span>
+                <span id="cart-total" class="text-3xl font-serif text-white font-bold">Rs. 0</span>
+            </div>
+            
+            <button onclick="checkoutWhatsApp()" class="w-full bg-gold-gradient text-dark font-bold py-4 rounded-md uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)] active:scale-95 transition-all">
+                <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M187.58 144.84l-32-16a8 8 0 0 0-8 1.5l-19.29 19.3a89.73 89.73 0 0 1-39.45-39.45l19.3-19.29a8 8 0 0 0 1.5-8l-16-32A8 8 0 0 0 86.46 44c-13.61 2-22.46 14.41-22.46 28c0 82.72 67.28 150 150 150c13.59 0 26-8.85 28-22.46a8 8 0 0 0-6.87-8.7A239.38 239.38 0 0 1 128 64a240.54 240.54 0 0 1 85.08 15.63a8 8 0 0 0 10.38-4.46a8 8 0 0 0-4.46-10.38A256.49 256.49 0 0 0 128 48a255.45 255.45 0 0 0-80.4 13C33 65.57 24 81 24 99.88c0 97 79 176 176 176c18.88 0 34.31-9 38.86-23.64A23.94 23.94 0 0 0 215 220l-16-32Z"/></svg>
+                Order via WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- View All Full Screen Modal -->
+    <div id="view-all-modal" class="fixed inset-0 z-[60] bg-dark flex flex-col h-[100dvh]">
+        <div class="p-6 border-b border-white/10 bg-surfaceLight/95 backdrop-blur-md flex justify-between items-center sticky top-0 z-10 shadow-xl">
+            <div>
+                <p class="text-gold-400 tracking-[0.2em] text-[10px] uppercase mb-1">Complete Collection</p>
+                <h2 id="modal-title" class="text-2xl md:text-3xl font-serif font-bold text-white capitalize">All Items</h2>
+            </div>
+            <button onclick="closeViewAll()" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
+            <div id="modal-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA LAYER ---
+        const menuData = {
+            burgers: [
+                { id: "b1", name: "Classic beef burger", price: 500, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" },
+                { id: "b2", name: "Beef cheese supreme", price: 600, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" },
+                { id: "b3", name: "Bunetto signature stuffed", price: 650, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
+                { id: "b4", name: "Beef smash bites", price: 650, img: "https://images.unsplash.com/photo-1594212699903-eca408c45bb2?q=80&w=600&auto=format&fit=crop" },
+                { id: "b5", name: "Shroom smash", price: 700, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
+                { id: "b6", name: "Onion bliss smash", price: 750, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" },
+                { id: "b7", name: "Bunetto megaton", price: 900, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
+                { id: "b8", name: "Bunetto crunchy core", price: 450, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
+                { id: "b9", name: "Twin patty burger", price: 620, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" },
+                { id: "b10", name: "Chicken melt stuffed", price: 600, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
+                { id: "b11", name: "Crunch zing", price: 450, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
+                { id: "b12", name: "Smoky zing", price: 500, img: "https://images.unsplash.com/photo-1594212699903-eca408c45bb2?q=80&w=600&auto=format&fit=crop" },
+                { id: "b13", name: "Double trouble burger", price: 1000, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
+                { id: "b14", name: "Bunetto mighty zing", price: 700, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
+                { id: "b15", name: "Fire cluck sandwich", price: 500, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
+                { id: "b16", name: "Crispy cluck", price: 550, img: "https://images.unsplash.com/photo-1594212699903-eca408c45bb2?q=80&w=600&auto=format&fit=crop" },
+                { id: "b17", name: "Cheese cluck", price: 650, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" }
+            ],
+            sides: [
+                { id: "s1", name: "Fire fries", price: 200, img: "https://images.unsplash.com/photo-1576107232684-1279f3908594?q=80&w=600&auto=format&fit=crop" },
+                { id: "s2", name: "Garlic boss", price: 300, img: "https://images.unsplash.com/photo-1530016555861-3d1f3f5ba94b?q=80&w=600&auto=format&fit=crop" },
+                { id: "s3", name: "Zesty chicken fries", price: 600, img: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=600&auto=format&fit=crop" },
+                { id: "s4", name: "Bunetto special sause", price: 500, img: "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?q=80&w=600&auto=format&fit=crop" },
+                { id: "s5", name: "Crispy wings", price: 480, img: "https://images.unsplash.com/photo-1524114664604-cd8133cd67ad?q=80&w=600&auto=format&fit=crop" },
+                { id: "s6", name: "Buffalo wings", price: 550, img: "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?q=80&w=600&auto=format&fit=crop" },
+                { id: "s7", name: "Dynamic chicken", price: 450, img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=600&auto=format&fit=crop" },
+                { id: "s8", name: "Alfredo sauce pasta", price: 700, img: "https://images.unsplash.com/photo-1612874742237-6526221588e3?q=80&w=600&auto=format&fit=crop" },
+                { id: "s9", name: "Bunetto street chowmein", price: 650, img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=600&auto=format&fit=crop" }
+            ],
+            beverages: [
+                { id: "d1", name: "Water (500ml)", price: 100, img: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?q=80&w=600&auto=format&fit=crop" },
+                { id: "d2", name: "Dew (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" },
+                { id: "d3", name: "Pepsi (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" },
+                { id: "d4", name: "7up (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" }
+            ]
+        };
+
+        const bestSellersIds = ["b3", "b7", "s1", "s8"];
+        const allProducts = [...menuData.burgers, ...menuData.sides, ...menuData.beverages];
+        
+        let cart = [];
+        const WHATSAPP_NUMBER = "923012343423"; 
+
+        // --- ANIMATION CONTROLLER ---
+        function triggerPopBadge() {
+            const countBadge = document.getElementById('cart-count');
+            countBadge.classList.remove('animate-badge-pop');
+            void countBadge.offsetWidth; // Force CSS Reflow to reset animation
+            countBadge.classList.add('animate-badge-pop');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            if (totalItems > 0) countBadge.classList.remove('scale-0');
+            else countBadge.classList.add('scale-0');
+        }
+
+        function spawnParticle(event, text) {
+            if(!event) return;
+            const el = document.createElement('div');
+            el.className = 'particle';
+            el.textContent = text;
+            
+            // Spawn at exact click coordinates
+            const x = event.clientX || (event.touches && event.touches[0].clientX);
+            const y = event.clientY || (event.touches && event.touches[0].clientY);
+            
+            if(x && y) {
+                el.style.left = `${x - 10}px`;
+                el.style.top = `${y - 20}px`;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 800); // Clean up
+            }
+        }
+
+        // --- CART UI CONTROLLER (IN-PLACE BUTTONS) ---
+        function getCartButtonHTML(id) {
+            const item = cart.find(c => c.id === id);
+            if (item) {
+                return `
+                    <div class="flex items-center bg-gold-gradient rounded-full h-10 px-1 shadow-lg text-dark z-20 transition-all">
+                        <button onclick="updateQuantity('${id}', -1, event)" class="w-8 h-8 flex items-center justify-center font-bold hover:bg-white/30 rounded-full transition-colors active:scale-90">
+                            <svg width="14" height="14" viewBox="0 0 256 256"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg>
+                        </button>
+                        <span class="w-6 text-center font-bold text-sm select-none">${item.qty}</span>
+                        <button onclick="updateQuantity('${id}', 1, event)" class="w-8 h-8 flex items-center justify-center font-bold hover:bg-white/30 rounded-full transition-colors active:scale-90">
+                            <svg width="14" height="14" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
+                        </button>
+                    </div>
+                `;
+            } else {
+                return `
+                    <button onclick="addToCart('${id}', event)" class="w-10 h-10 rounded-full bg-surfaceLight border border-gold-400/50 text-gold-400 hover:bg-gold-gradient hover:text-dark hover:border-transparent flex items-center justify-center transition-all shadow-[0_0_15px_rgba(212,175,55,0.1)] z-20 active:scale-90">
+                        <svg width="18" height="18" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
+                    </button>
+                `;
+            }
+        }
+
+        function syncCartButtons() {
+            document.querySelectorAll('.cart-btn-wrapper').forEach(wrapper => {
+                const id = wrapper.getAttribute('data-id');
+                wrapper.innerHTML = getCartButtonHTML(id);
+            });
+        }
+
+        // --- HTML TEMPLATES ---
+        function generateCardWrap(product) {
+            return `
+                <div class="carousel-item-wrap w-[240px] md:w-[320px]">
+                    <div class="menu-card bg-surfaceLight border border-white/5 p-4 rounded-xl relative group flex flex-col h-[380px] md:h-[400px] shadow-2xl mx-auto w-full">
+                        <div class="h-40 md:h-48 overflow-hidden mb-4 relative rounded-lg shrink-0">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-0 transition-opacity z-10 pointer-events-none"></div>
+                            <img src="${product.img}" alt="${product.name}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 flex flex-col justify-between pointer-events-auto">
+                            <h3 class="font-serif text-[17px] md:text-[18px] text-white group-hover:text-gold-400 transition-colors line-clamp-2 leading-snug mb-2">${product.name}</h3>
+                            <div class="flex justify-between items-center mt-auto pt-4 border-t border-white/5">
+                                <span class="text-gold-400 font-bold text-base md:text-lg tracking-wide">Rs. ${product.price}</span>
+                                <div class="cart-btn-wrapper flex justify-end" data-id="${product.id}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateListItemHTML(product, isLast) {
+            return `
+                <div class="flex items-center gap-4 py-4 ${!isLast ? 'border-b border-white/5' : ''} hover:bg-white/[0.03] transition-colors rounded-lg px-2 group">
+                    <div class="relative w-16 h-16 md:w-20 md:h-20 shrink-0">
+                        <div class="absolute inset-0 bg-gold-500/20 rounded-md opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none"></div>
+                        <img src="${product.img}" class="w-full h-full object-cover rounded-md border border-white/10">
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-white font-serif text-base md:text-lg transition-colors group-hover:text-gold-400">${product.name}</h4>
+                        <p class="text-gold-400 font-semibold text-sm md:text-base mt-1">Rs. ${product.price}</p>
+                    </div>
+                    <div class="cart-btn-wrapper flex justify-end items-center shrink-0" data-id="${product.id}"></div>
+                </div>
+            `;
+        }
+
+        function generateModalCardHTML(product) {
+            return `
+                <div class="menu-card bg-surfaceLight border border-white/5 p-4 rounded-xl relative group flex flex-col h-[350px] shadow-lg">
+                    <div class="h-40 overflow-hidden mb-4 relative rounded-lg shrink-0">
+                        <img src="${product.img}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <h3 class="font-serif text-[16px] text-white group-hover:text-gold-400 transition-colors line-clamp-2 mb-2">${product.name}</h3>
+                        <div class="flex justify-between items-center mt-auto pt-3 border-t border-white/5">
+                            <span class="text-gold-400 font-bold">Rs. ${product.price}</span>
+                            <div class="cart-btn-wrapper flex justify-end" data-id="${product.id}"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- NATIVE BLUR CAROUSEL ENGINE ---
+        function initNativeCarousel(categoryId) {
+            const track = document.getElementById(`track-${categoryId}`);
+            const items = menuData[categoryId];
+            
+            const repeatedItems = [...items, ...items, ...items, ...items];
+            track.innerHTML = repeatedItems.map(p => generateCardWrap(p)).join('');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    } else {
+                        entry.target.classList.remove('active');
+                    }
+                });
+            }, {
+                root: track,
+                threshold: 0.6 // Snaps accurately on center focus
+            });
+
+            track.querySelectorAll('.carousel-item-wrap').forEach(el => observer.observe(el));
+
+            let interval = setInterval(() => scrollCarousel(categoryId, 1), 3500);
+            
+            track.addEventListener('mouseenter', () => clearInterval(interval));
+            track.addEventListener('mouseleave', () => {
+                clearInterval(interval);
+                interval = setInterval(() => scrollCarousel(categoryId, 1), 3500);
+            });
+            track.addEventListener('touchstart', () => clearInterval(interval), {passive: true});
+
+            track.addEventListener('scroll', () => {
+                if(track.children.length < 2) return;
+                const singleItemWidth = track.children[1].offsetLeft - track.children[0].offsetLeft;
+                const setWidth = items.length * singleItemWidth;
+                
+                if (track.scrollLeft > setWidth * 2.5) {
+                    track.style.scrollBehavior = 'auto';
+                    track.scrollLeft -= setWidth;
+                    requestAnimationFrame(() => track.style.scrollBehavior = 'smooth');
+                }
+                if (track.scrollLeft < setWidth * 0.5) {
+                    track.style.scrollBehavior = 'auto';
+                    track.scrollLeft += setWidth;
+                    requestAnimationFrame(() => track.style.scrollBehavior = 'smooth');
+                }
+            });
+
+            setTimeout(() => {
+                const singleItemWidth = track.children.length > 1 ? (track.children[1].offsetLeft - track.children[0].offsetLeft) : 300;
+                track.style.scrollBehavior = 'auto';
+                track.scrollLeft = (items.length * 2) * singleItemWidth; 
+                requestAnimationFrame(() => track.style.scrollBehavior = 'smooth');
+            }, 100);
+        }
+
+        function scrollCarousel(categoryId, direction) {
+            const track = document.getElementById(`track-${categoryId}`);
+            if(!track.children.length) return;
+            const cardWidthWithGap = track.children[1].offsetLeft - track.children[0].offsetLeft;
+            track.scrollBy({ left: direction * cardWidthWithGap, behavior: 'smooth' });
+        }
+
+        // --- STATIC LIST RENDERING ---
+        function renderBestSellers() {
+            const container = document.getElementById('list-bestsellers');
+            let html = '';
+            bestSellersIds.forEach((id, idx) => {
+                const p = allProducts.find(x => x.id === id);
+                if (p) html += generateListItemHTML(p, idx === bestSellersIds.length - 1);
+            });
+            container.innerHTML = html;
+        }
+
+        function renderBeverages() {
+            const container = document.getElementById('list-beverages');
+            let html = '';
+            menuData.beverages.forEach((p, idx) => {
+                html += generateListItemHTML(p, idx === menuData.beverages.length - 1);
+            });
+            container.innerHTML = html;
+        }
+
+        // --- VIEW ALL MODAL ---
+        function openViewAll(categoryId) {
+            const modal = document.getElementById('view-all-modal');
+            const grid = document.getElementById('modal-grid');
+            document.getElementById('modal-title').textContent = `All ${categoryId}`;
+            
+            grid.innerHTML = menuData[categoryId].map(p => generateModalCardHTML(p)).join('');
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            syncCartButtons(); 
+        }
+
+        function closeViewAll() {
+            document.getElementById('view-all-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- CORE CART LOGIC ---
+        function addToCart(productId, event) {
+            const product = allProducts.find(p => p.id === productId);
+            if(product) {
+                cart.push({ ...product, qty: 1 });
+                spawnParticle(event, '+1');
+            }
+            updateCartUI();
+        }
+
+        function updateQuantity(productId, delta, event) {
+            const itemIndex = cart.findIndex(item => item.id === productId);
+            if (itemIndex > -1) {
+                cart[itemIndex].qty += delta;
+                spawnParticle(event, delta > 0 ? '+1' : '-1');
+                
+                if (cart[itemIndex].qty <= 0) cart.splice(itemIndex, 1);
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            const countEl = document.getElementById('cart-count');
+            const orderType = document.getElementById('order-type').value;
+            const deliveryFeeRow = document.getElementById('delivery-fee-row');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            countEl.textContent = totalItems;
+            
+            triggerPopBadge(); // Always fires accurately
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-gray-500 space-y-4 pt-20">
+                        <svg width="60" height="60" viewBox="0 0 256 256" class="opacity-20"><path fill="currentColor" d="M216 64h-40v-8a48 48 0 0 0-96 0v8H40a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16Zm-120-8a32 32 0 0 1 64 0v8H96Zm120 152H40V80h176v128Z"/></svg>
+                        <p class="text-sm uppercase tracking-widest">Your order is empty.</p>
+                    </div>
+                `;
+                totalEl.textContent = "Rs. 0";
+                deliveryFeeRow.classList.add('hidden');
+            } else {
+                let total = 0;
+                let deliveryFee = 0;
+                container.innerHTML = '';
+
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.qty;
+                    total += itemTotal;
+
+                    container.innerHTML += `
+                        <div class="flex gap-4 items-center bg-surfaceLight p-3 rounded-lg border border-white/5">
+                            <img src="${item.img}" class="w-16 h-16 object-cover rounded-md">
+                            <div class="flex-1">
+                                <h4 class="text-white font-serif text-sm leading-tight">${item.name}</h4>
+                                <div class="text-gold-400 text-sm mt-1 font-bold">Rs. ${item.price}</div>
+                                
+                                <div class="flex items-center gap-3 mt-3">
+                                    <button onclick="updateQuantity('${item.id}', -1, event)" class="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-colors active:scale-90">
+                                        <svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg>
+                                    </button>
+                                    <span class="text-sm w-4 text-center text-white">${item.qty}</span>
+                                    <button onclick="updateQuantity('${item.id}', 1, event)" class="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-colors active:scale-90">
+                                        <svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-white font-semibold text-sm">Rs. ${itemTotal}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (orderType === 'delivery') {
+                    deliveryFee = 150;
+                    deliveryFeeRow.classList.remove('hidden');
+                } else {
+                    deliveryFeeRow.classList.add('hidden');
+                }
+
+                total += deliveryFee;
+                totalEl.textContent = `Rs. ${total}`;
+            }
+            syncCartButtons();
+        }
+
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const backdrop = document.getElementById('cart-backdrop');
+            drawer.classList.toggle('active');
+            backdrop.classList.toggle('active');
+            if(drawer.classList.contains('active')) document.body.style.overflow = 'hidden';
+            else document.body.style.overflow = 'auto';
+        }
+
+        function checkoutWhatsApp() {
+            if (cart.length === 0) {
+                alert("Please add items to your order first.");
+                return;
+            }
+
+            const orderType = document.getElementById('order-type').value;
+            const orderTypeLabel = orderType === 'delivery' ? 'Delivery' : 'Pickup';
+
+            let message = `Hello *Bunetto*! 🍔✨\nI'd like to place a *${orderTypeLabel}* order:\n\n`;
+            let total = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+                message += `▪ *${item.qty}x* ${item.name} - Rs. ${itemTotal}\n`;
+            });
+
+            if (orderType === 'delivery') {
+                message += `▪ Delivery Fee - Rs. 150\n`;
+                total += 150;
+            }
+
+            message += `\n*Total Amount: Rs. ${total}*\n\n`;
+            
+            if (orderType === 'delivery') {
+                message += "Please let me know how I can make the payment and the estimated delivery time. Here is my delivery address:\n\n[Please enter your address here]\n\nThank you!";
+            } else {
+                message += "Please let me know how I can make the payment and when my order will be ready for pickup. Thank you!";
+            }
+
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function handleScroll() {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('nav-scrolled', 'py-2'), nav.classList.remove('py-4');
+            else nav.classList.remove('nav-scrolled', 'py-2'), nav.classList.add('py-4');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBestSellers();
+            initNativeCarousel('burgers');
+            initNativeCarousel('sides');
+            renderBeverages();
+            syncCartButtons();
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
+            
+            window.addEventListener('scroll', handleScroll);
+        });
+
+    </script>
+</body>
+</html>
