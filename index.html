@@ -6,11 +6,15 @@
     <title>Bunetto | Premium Burgers</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Preconnects for Performance -->
+    <link rel="preconnect" href="https://images.unsplash.com">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <script>
-        tailwind.config = {
+        // Safely initialize tailwind config to prevent ReferenceError if CDN loads asynchronously
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -39,6 +43,12 @@
             overflow-x: hidden;
         }
 
+        /* Prevent scrolling while curtains are closed */
+        body.locked {
+            overflow: hidden;
+            touch-action: none;
+        }
+
         .text-gold-gradient {
             background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
             -webkit-background-clip: text;
@@ -53,6 +63,25 @@
         }
 
         @keyframes shine { to { background-position: 200% center; } }
+
+        /* --- CURTAIN ANIMATIONS --- */
+        .curtain-panel {
+            transition: transform 1.5s cubic-bezier(0.77, 0, 0.175, 1);
+            background: linear-gradient(90deg, #050505 0%, #111111 50%, #050505 100%);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+        }
+        
+        .curtain-left.open { transform: translateX(-100%); }
+        .curtain-right.open { transform: translateX(100%); }
+        
+        #curtain-content {
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+        }
+        #curtain-content.hide {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
 
         .reveal-text {
             opacity: 0;
@@ -81,17 +110,14 @@
         }
         .carousel-track::-webkit-scrollbar { display: none; }
         
-        /* Math to perfectly center cards */
         .carousel-track::before,
         .carousel-track::after {
             content: '';
-            /* 120px is half of the mobile card width (240px) */
             flex: 0 0 calc(50vw - 120px); 
         }
         @media (min-width: 768px) {
             .carousel-track::before,
             .carousel-track::after {
-                /* 160px is half of the desktop card width (320px) */
                 flex: 0 0 calc(50vw - 160px); 
             }
         }
@@ -123,9 +149,7 @@
             50% { transform: scale(1.35); }
             100% { transform: scale(1); }
         }
-        .animate-badge-pop {
-            animation: pop 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
+        .animate-badge-pop { animation: pop 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
 
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
@@ -157,7 +181,62 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased selection:bg-gold-500 selection:text-dark">
+<body class="font-sans antialiased selection:bg-gold-500 selection:text-dark locked">
+
+    <!-- ================= OPENING CURTAIN & TIMER ================= -->
+    <div id="opening-curtain" class="fixed inset-0 z-[100] flex overflow-hidden">
+        <!-- Left Curtain -->
+        <div id="curtain-left" class="curtain-panel curtain-left w-1/2 h-full border-r border-gold-500/30 relative">
+            <!-- Decorative Gold Line -->
+            <div class="absolute right-0 top-0 bottom-0 w-[2px] bg-gold-gradient shadow-[0_0_15px_rgba(212,175,55,0.5)]"></div>
+        </div>
+        
+        <!-- Right Curtain -->
+        <div id="curtain-right" class="curtain-panel curtain-right w-1/2 h-full border-l border-gold-500/30 relative">
+            <!-- Decorative Gold Line -->
+            <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-gold-gradient shadow-[0_0_15px_rgba(212,175,55,0.5)]"></div>
+        </div>
+
+        <!-- Timer Content Overlay -->
+        <div id="curtain-content" class="absolute inset-0 flex flex-col items-center justify-center z-10 px-4">
+            <!-- Optimization: Replaced heavy backdrop-blur with solid dark overlay to free up GPU -->
+            <div class="absolute inset-0 bg-black/90 -z-10"></div>
+            
+            <h1 class="text-5xl md:text-8xl font-serif font-bold text-gold-gradient mb-2 drop-shadow-2xl">BUNETTO.</h1>
+            <p class="tracking-[0.4em] uppercase text-xs md:text-sm text-gold-400 mb-12 font-semibold">Grand Opening</p>
+            
+            <!-- Countdown Timer -->
+            <div class="flex gap-4 md:gap-8 text-center bg-dark/90 p-6 md:p-10 rounded-2xl border border-white/10 shadow-[0_0_50px_rgba(212,175,55,0.1)]">
+                <div class="flex flex-col items-center">
+                    <span id="timer-days" class="text-4xl md:text-6xl font-serif text-white mb-2">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-400 uppercase tracking-widest">Days</span>
+                </div>
+                <span class="text-4xl md:text-6xl font-serif text-white/20">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="timer-hours" class="text-4xl md:text-6xl font-serif text-white mb-2">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-400 uppercase tracking-widest">Hours</span>
+                </div>
+                <span class="text-4xl md:text-6xl font-serif text-white/20">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="timer-mins" class="text-4xl md:text-6xl font-serif text-white mb-2">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-400 uppercase tracking-widest">Mins</span>
+                </div>
+                <span class="text-4xl md:text-6xl font-serif text-white/20">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="timer-secs" class="text-4xl md:text-6xl font-serif text-gold-400 mb-2">00</span>
+                    <span class="text-[10px] md:text-xs text-gray-500 uppercase tracking-widest">Secs</span>
+                </div>
+            </div>
+
+            <!-- Bypass Button for Client Preview -->
+            <button onclick="openCurtains()" class="mt-16 text-xs text-gray-500 hover:text-gold-400 uppercase tracking-widest transition-colors border-b border-transparent hover:border-gold-400 flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M247.31 124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57 61.26 162.88 48 128 48S61.43 61.26 36.34 86.35C17.51 105.18 9 124 8.69 124.76a8 8 0 0 0 0 6.48c.35.79 8.82 19.58 27.65 38.41C61.43 194.74 93.12 208 128 208s66.57-13.26 91.66-38.35c18.83-18.83 27.3-37.62 27.65-38.41a8 8 0 0 0 0-6.48ZM128 192c-30.78 0-57.67-11.19-79.93-33.25A133.47 133.47 0 0 1 25 128a133.33 133.33 0 0 1 23.07-30.75C70.33 75.19 97.22 64 128 64s57.67 11.19 79.93 33.25A133.46 133.46 0 0 1 231 128c-7.23 13.47-53.53 64-103 64Zm0-112a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48Zm0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32Z"/></svg>
+                Sneak Peek
+            </button>
+        </div>
+    </div>
+    <!-- ================= END CURTAIN ================= -->
+
 
     <!-- Navigation -->
     <nav id="navbar" class="fixed w-full z-40 transition-all duration-300 py-4">
@@ -205,6 +284,7 @@
                     <div class="absolute inset-0 bg-gold-500 rounded-full opacity-10 filter blur-[60px] animate-pulse"></div>
                     <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1500&auto=format&fit=crop" 
                          alt="Premium Burger" 
+                         fetchpriority="high"
                          class="w-[85%] h-[85%] object-cover rounded-full shadow-[0_0_50px_rgba(212,175,55,0.15)] floating-element border-4 border-surfaceLight">
                 </div>
             </div>
@@ -345,7 +425,6 @@
         <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
 
         <div class="p-6 border-t border-white/10 bg-dark shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-            <!-- Order Type Selection -->
             <div class="mb-4">
                 <label class="text-gray-400 text-xs uppercase tracking-widest mb-2 block">Order Type</label>
                 <div class="relative">
@@ -359,7 +438,6 @@
                 </div>
             </div>
 
-            <!-- Optional Delivery Fee Row -->
             <div id="delivery-fee-row" class="flex justify-between items-center mb-2 hidden">
                 <span class="text-gray-400 text-sm">Delivery Fee</span>
                 <span class="text-white text-sm font-bold">Rs. 150</span>
@@ -394,13 +472,69 @@
     </div>
 
     <script>
-        // --- DATA LAYER ---
+        // --- COUNTDOWN TIMER & CURTAIN LOGIC ---
+        function initTimerAndCurtains() {
+            // Set opening date to 5 days from now
+            const openingDate = new Date();
+            openingDate.setDate(openingDate.getDate() + 5);
+            openingDate.setHours(18, 0, 0, 0); // 6:00 PM
+
+            const daysEl = document.getElementById('timer-days');
+            const hoursEl = document.getElementById('timer-hours');
+            const minsEl = document.getElementById('timer-mins');
+            const secsEl = document.getElementById('timer-secs');
+
+            const timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = openingDate.getTime() - now;
+
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    openCurtains();
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                daysEl.textContent = String(days).padStart(2, '0');
+                hoursEl.textContent = String(hours).padStart(2, '0');
+                minsEl.textContent = String(minutes).padStart(2, '0');
+                secsEl.textContent = String(seconds).padStart(2, '0');
+            }, 1000);
+        }
+
+        function openCurtains() {
+            const content = document.getElementById('curtain-content');
+            const left = document.getElementById('curtain-left');
+            const right = document.getElementById('curtain-right');
+            const curtainWrapper = document.getElementById('opening-curtain');
+
+            // 1. Fade out the text & timer
+            content.classList.add('hide');
+
+            // 2. Slide curtains apart after text fades
+            setTimeout(() => {
+                left.classList.add('open');
+                right.classList.add('open');
+                document.body.classList.remove('locked'); // Allow scrolling
+            }, 400);
+
+            // 3. Remove wrapper from DOM after animation completes
+            setTimeout(() => {
+                curtainWrapper.style.display = 'none';
+            }, 1900);
+        }
+
+        // --- MENU DATA ---
         const menuData = {
             burgers: [
                 { id: "b1", name: "Classic beef burger", price: 500, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" },
                 { id: "b2", name: "Beef cheese supreme", price: 600, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" },
                 { id: "b3", name: "Bunetto signature stuffed", price: 650, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
-                { id: "b4", name: "Beef smash bites", price: 650, img: "https://images.unsplash.com/photo-1594212699903-eca408c45bb2?q=80&w=600&auto=format&fit=crop" },
+                { id: "b4", name: "Beef smash bites", price: 650, img: "data:image/jpeg;base64,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" },
                 { id: "b5", name: "Shroom smash", price: 700, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
                 { id: "b6", name: "Onion bliss smash", price: 750, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" },
                 { id: "b7", name: "Bunetto megaton", price: 900, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
@@ -408,16 +542,16 @@
                 { id: "b9", name: "Twin patty burger", price: 620, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" },
                 { id: "b10", name: "Chicken melt stuffed", price: 600, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
                 { id: "b11", name: "Crunch zing", price: 450, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
-                { id: "b12", name: "Smoky zing", price: 500, img: "https://images.unsplash.com/photo-1594212699903-eca408c45bb2?q=80&w=600&auto=format&fit=crop" },
+                { id: "b12", name: "Smoky zing", price: 500, img:"images/smoky zing.png"},
                 { id: "b13", name: "Double trouble burger", price: 1000, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
                 { id: "b14", name: "Bunetto mighty zing", price: 700, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
                 { id: "b15", name: "Fire cluck sandwich", price: 500, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
-                { id: "b16", name: "Crispy cluck", price: 550, img: "https://images.unsplash.com/photo-1594212699903-eca408c45bb2?q=80&w=600&auto=format&fit=crop" },
+                { id: "b16", name: "Crispy cluck", price: 550, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK2O_3DfVzV1ZyllnOpGjWaecciDqMd3mEdw&s" },
                 { id: "b17", name: "Cheese cluck", price: 650, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" }
             ],
             sides: [
-                { id: "s1", name: "Fire fries", price: 200, img: "https://images.unsplash.com/photo-1576107232684-1279f3908594?q=80&w=600&auto=format&fit=crop" },
-                { id: "s2", name: "Garlic boss", price: 300, img: "https://images.unsplash.com/photo-1530016555861-3d1f3f5ba94b?q=80&w=600&auto=format&fit=crop" },
+                { id: "s1", name: "Fire fries", price: 200, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRyDm6uSiCaVGL_mVPHvDglhQs8dQajPc0Bg&s" },
+                { id: "s2", name: "Garlic boss", price: 300, img: "data:image/jpeg;base64,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" },
                 { id: "s3", name: "Zesty chicken fries", price: 600, img: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=600&auto=format&fit=crop" },
                 { id: "s4", name: "Bunetto special sause", price: 500, img: "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?q=80&w=600&auto=format&fit=crop" },
                 { id: "s5", name: "Crispy wings", price: 480, img: "https://images.unsplash.com/photo-1524114664604-cd8133cd67ad?q=80&w=600&auto=format&fit=crop" },
@@ -427,7 +561,7 @@
                 { id: "s9", name: "Bunetto street chowmein", price: 650, img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=600&auto=format&fit=crop" }
             ],
             beverages: [
-                { id: "d1", name: "Water (500ml)", price: 100, img: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?q=80&w=600&auto=format&fit=crop" },
+                { id: "d1", name: "Water (500ml)", price: 100, img: "https://www.pngarts.com/files/4/Water-Bottle-Transparent-Background-PNG.png" },
                 { id: "d2", name: "Dew (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" },
                 { id: "d3", name: "Pepsi (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" },
                 { id: "d4", name: "7up (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" }
@@ -440,11 +574,11 @@
         let cart = [];
         const WHATSAPP_NUMBER = "923012343423"; 
 
-        // --- ANIMATION CONTROLLER ---
+        // --- CART UI ENGINE ---
         function triggerPopBadge() {
             const countBadge = document.getElementById('cart-count');
             countBadge.classList.remove('animate-badge-pop');
-            void countBadge.offsetWidth; // Force CSS Reflow to reset animation
+            void countBadge.offsetWidth;
             countBadge.classList.add('animate-badge-pop');
             
             const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -458,7 +592,6 @@
             el.className = 'particle';
             el.textContent = text;
             
-            // Spawn at exact click coordinates
             const x = event.clientX || (event.touches && event.touches[0].clientX);
             const y = event.clientY || (event.touches && event.touches[0].clientY);
             
@@ -466,11 +599,10 @@
                 el.style.left = `${x - 10}px`;
                 el.style.top = `${y - 20}px`;
                 document.body.appendChild(el);
-                setTimeout(() => el.remove(), 800); // Clean up
+                setTimeout(() => el.remove(), 800); 
             }
         }
 
-        // --- CART UI CONTROLLER (IN-PLACE BUTTONS) ---
         function getCartButtonHTML(id) {
             const item = cart.find(c => c.id === id);
             if (item) {
@@ -496,19 +628,18 @@
 
         function syncCartButtons() {
             document.querySelectorAll('.cart-btn-wrapper').forEach(wrapper => {
-                const id = wrapper.getAttribute('data-id');
-                wrapper.innerHTML = getCartButtonHTML(id);
+                wrapper.innerHTML = getCartButtonHTML(wrapper.getAttribute('data-id'));
             });
         }
 
-        // --- HTML TEMPLATES ---
+        // --- HTML RENDERING ---
         function generateCardWrap(product) {
             return `
                 <div class="carousel-item-wrap w-[240px] md:w-[320px]">
                     <div class="menu-card bg-surfaceLight border border-white/5 p-4 rounded-xl relative group flex flex-col h-[380px] md:h-[400px] shadow-2xl mx-auto w-full">
                         <div class="h-40 md:h-48 overflow-hidden mb-4 relative rounded-lg shrink-0">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-0 transition-opacity z-10 pointer-events-none"></div>
-                            <img src="${product.img}" alt="${product.name}" class="w-full h-full object-cover">
+                            <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 flex flex-col justify-between pointer-events-auto">
                             <h3 class="font-serif text-[17px] md:text-[18px] text-white group-hover:text-gold-400 transition-colors line-clamp-2 leading-snug mb-2">${product.name}</h3>
@@ -527,7 +658,7 @@
                 <div class="flex items-center gap-4 py-4 ${!isLast ? 'border-b border-white/5' : ''} hover:bg-white/[0.03] transition-colors rounded-lg px-2 group">
                     <div class="relative w-16 h-16 md:w-20 md:h-20 shrink-0">
                         <div class="absolute inset-0 bg-gold-500/20 rounded-md opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none"></div>
-                        <img src="${product.img}" class="w-full h-full object-cover rounded-md border border-white/10">
+                        <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover rounded-md border border-white/10">
                     </div>
                     <div class="flex-1">
                         <h4 class="text-white font-serif text-base md:text-lg transition-colors group-hover:text-gold-400">${product.name}</h4>
@@ -542,7 +673,7 @@
             return `
                 <div class="menu-card bg-surfaceLight border border-white/5 p-4 rounded-xl relative group flex flex-col h-[350px] shadow-lg">
                     <div class="h-40 overflow-hidden mb-4 relative rounded-lg shrink-0">
-                        <img src="${product.img}" class="w-full h-full object-cover">
+                        <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover">
                     </div>
                     <div class="flex-1 flex flex-col justify-between">
                         <h3 class="font-serif text-[16px] text-white group-hover:text-gold-400 transition-colors line-clamp-2 mb-2">${product.name}</h3>
@@ -555,7 +686,7 @@
             `;
         }
 
-        // --- NATIVE BLUR CAROUSEL ENGINE ---
+        // --- CAROUSEL ENGINE ---
         function initNativeCarousel(categoryId) {
             const track = document.getElementById(`track-${categoryId}`);
             const items = menuData[categoryId];
@@ -565,16 +696,10 @@
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                    } else {
-                        entry.target.classList.remove('active');
-                    }
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                    else entry.target.classList.remove('active');
                 });
-            }, {
-                root: track,
-                threshold: 0.6 // Snaps accurately on center focus
-            });
+            }, { root: track, threshold: 0.6 });
 
             track.querySelectorAll('.carousel-item-wrap').forEach(el => observer.observe(el));
 
@@ -587,29 +712,43 @@
             });
             track.addEventListener('touchstart', () => clearInterval(interval), {passive: true});
 
+            let isResetting = false;
             track.addEventListener('scroll', () => {
-                if(track.children.length < 2) return;
+                if(track.children.length < 2 || isResetting) return;
+                
                 const singleItemWidth = track.children[1].offsetLeft - track.children[0].offsetLeft;
                 const setWidth = items.length * singleItemWidth;
                 
+                // Safegaurd: Prevent infinite loop if layout hasn't rendered yet (width is 0)
+                if (setWidth <= 0) return; 
+                
                 if (track.scrollLeft > setWidth * 2.5) {
+                    isResetting = true;
                     track.style.scrollBehavior = 'auto';
                     track.scrollLeft -= setWidth;
-                    requestAnimationFrame(() => track.style.scrollBehavior = 'smooth');
+                    requestAnimationFrame(() => {
+                        track.style.scrollBehavior = 'smooth';
+                        isResetting = false;
+                    });
                 }
-                if (track.scrollLeft < setWidth * 0.5) {
+                else if (track.scrollLeft < setWidth * 0.5) {
+                    isResetting = true;
                     track.style.scrollBehavior = 'auto';
                     track.scrollLeft += setWidth;
-                    requestAnimationFrame(() => track.style.scrollBehavior = 'smooth');
+                    requestAnimationFrame(() => {
+                        track.style.scrollBehavior = 'smooth';
+                        isResetting = false;
+                    });
                 }
             });
 
+            // Slightly increased timeout to ensure Tailwind CDN has applied styles
             setTimeout(() => {
-                const singleItemWidth = track.children.length > 1 ? (track.children[1].offsetLeft - track.children[0].offsetLeft) : 300;
+                const singleItemWidth = track.children.length > 1 ? Math.max(track.children[1].offsetLeft - track.children[0].offsetLeft, 300) : 300;
                 track.style.scrollBehavior = 'auto';
                 track.scrollLeft = (items.length * 2) * singleItemWidth; 
                 requestAnimationFrame(() => track.style.scrollBehavior = 'smooth');
-            }, 100);
+            }, 300);
         }
 
         function scrollCarousel(categoryId, direction) {
@@ -619,7 +758,7 @@
             track.scrollBy({ left: direction * cardWidthWithGap, behavior: 'smooth' });
         }
 
-        // --- STATIC LIST RENDERING ---
+        // --- INIT LISTS ---
         function renderBestSellers() {
             const container = document.getElementById('list-bestsellers');
             let html = '';
@@ -639,25 +778,35 @@
             container.innerHTML = html;
         }
 
-        // --- VIEW ALL MODAL ---
         function openViewAll(categoryId) {
             const modal = document.getElementById('view-all-modal');
             const grid = document.getElementById('modal-grid');
             document.getElementById('modal-title').textContent = `All ${categoryId}`;
             
-            grid.innerHTML = menuData[categoryId].map(p => generateModalCardHTML(p)).join('');
+            grid.innerHTML = menuData[categoryId].map(p => `
+                <div class="menu-card bg-surfaceLight border border-white/5 p-4 rounded-xl relative group flex flex-col h-[350px] shadow-lg">
+                    <div class="h-40 overflow-hidden mb-4 relative rounded-lg shrink-0">
+                        <img src="${p.img}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <h3 class="font-serif text-[16px] text-white group-hover:text-gold-400 transition-colors line-clamp-2 mb-2">${p.name}</h3>
+                        <div class="flex justify-between items-center mt-auto pt-3 border-t border-white/5">
+                            <span class="text-gold-400 font-bold">Rs. ${p.price}</span>
+                            <div class="cart-btn-wrapper flex justify-end" data-id="${p.id}"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
             
             modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
             syncCartButtons(); 
         }
 
         function closeViewAll() {
             document.getElementById('view-all-modal').classList.remove('active');
-            document.body.style.overflow = 'auto';
         }
 
-        // --- CORE CART LOGIC ---
+        // --- CART LOGIC ---
         function addToCart(productId, event) {
             const product = allProducts.find(p => p.id === productId);
             if(product) {
@@ -672,7 +821,6 @@
             if (itemIndex > -1) {
                 cart[itemIndex].qty += delta;
                 spawnParticle(event, delta > 0 ? '+1' : '-1');
-                
                 if (cart[itemIndex].qty <= 0) cart.splice(itemIndex, 1);
                 updateCartUI();
             }
@@ -687,8 +835,7 @@
 
             const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
             countEl.textContent = totalItems;
-            
-            triggerPopBadge(); // Always fires accurately
+            triggerPopBadge(); 
 
             if (cart.length === 0) {
                 container.innerHTML = `
@@ -750,8 +897,6 @@
             const backdrop = document.getElementById('cart-backdrop');
             drawer.classList.toggle('active');
             backdrop.classList.toggle('active');
-            if(drawer.classList.contains('active')) document.body.style.overflow = 'hidden';
-            else document.body.style.overflow = 'auto';
         }
 
         function checkoutWhatsApp() {
@@ -795,6 +940,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            initTimerAndCurtains();
             renderBestSellers();
             initNativeCarousel('burgers');
             initNativeCarousel('sides');
