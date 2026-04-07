@@ -69,15 +69,6 @@
         // --- DYNAMIC LAYOUT CONFIG ---
         let categoryConfig;
 
-        categoryConfig.forEach(cat => {
-            const count = menuData[cat.id].length;
-            if (cat.id === 'beverages') cat.type = 'list';
-            else if (cat.id === 'zinger' || cat.id === 'fries') cat.type = 'carousel';
-            else if (count > 4) cat.type = 'carousel';
-            else if (count === 4) cat.type = 'grid';
-            else cat.type = 'list';
-        });
-
         // --- DYNAMIC RENDERING ---
         function renderCategoryNav() {
             const navContainer = document.getElementById('category-nav');
@@ -702,24 +693,32 @@
                 signatureIds = data.signatureIds;
                 categoryConfig = data.categoryConfig;
                 allProducts = Object.values(menuData).flat();
+
+                categoryConfig.forEach(cat => {
+                    const count = menuData[cat.id]?.length || 0;
+                    if (cat.id === 'beverages') cat.type = 'list';
+                    else if (cat.id === 'zinger' || cat.id === 'fries') cat.type = 'carousel';
+                    else if (count > 4) cat.type = 'carousel';
+                    else if (count === 4) cat.type = 'grid';
+                    else cat.type = 'list';
+                });
+                // Initialize Dynamic Content Engine
+                renderCategoryNav();
+                renderAllCategories();
+                renderSignature();
+                syncCartButtons();
+                
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+                }, { threshold: 0.1 });
+                
+                document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
             }
         } catch(e) { console.error("Could not load data.json", e); }
 
-            initTimerAndCurtains();
-            startHeroAutoRotate();
-            
-            // Initialize Dynamic Content Engine
-            renderCategoryNav();
-            renderAllCategories();
-            renderSignature();
-            syncCartButtons();
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
-            }, { threshold: 0.1 });
-            
-            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
-            window.addEventListener('scroll', handleScroll);
+        initTimerAndCurtains();
+        startHeroAutoRotate();
+        window.addEventListener('scroll', handleScroll);
         });
 
     
