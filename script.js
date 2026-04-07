@@ -1,0 +1,1051 @@
+window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 400: '#D4AF37', 500: '#BF953F', 600: '#AA771C' },
+                        // Updated to Light Theme palette
+                        dark: '#ffffff', 
+                        surface: '#f9fafb', 
+                        surfaceLight: '#ffffff'
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="font-sans antialiased selection:bg-gold-500 selection:text-white locked relative">
+
+    <!-- ================= OPENING CURTAIN & TIMER ================= -->
+    <div id="opening-curtain" class="fixed inset-0 z-[100] flex overflow-hidden">
+        <div id="curtain-left" class="curtain-panel curtain-left w-1/2 h-full border-r border-gray-200 relative">
+            <div class="absolute right-0 top-0 bottom-0 w-[2px] bg-gold-gradient shadow-[0_0_15px_rgba(212,175,55,0.3)]"></div>
+        </div>
+        <div id="curtain-right" class="curtain-panel curtain-right w-1/2 h-full border-l border-gray-200 relative">
+            <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-gold-gradient shadow-[0_0_15px_rgba(212,175,55,0.3)]"></div>
+        </div>
+
+        <div id="curtain-content" class="absolute inset-0 flex flex-col items-center justify-center z-10 px-4">
+            <div class="absolute inset-0 bg-white/95 backdrop-blur-md -z-10"></div>
+            
+            <h1 class="text-5xl md:text-8xl font-serif font-bold text-gold-gradient mb-2 drop-shadow-sm">BUNETTO.</h1>
+            <p class="tracking-[0.4em] uppercase text-xs md:text-sm text-gray-500 mb-10 font-semibold">Grand Opening</p>
+            
+            <div class="flex gap-4 md:gap-8 text-center bg-gray-50/90 p-6 md:p-10 rounded-2xl border border-gray-200 shadow-[0_10px_40px_rgba(0,0,0,0.08)]">
+                <div class="flex flex-col items-center">
+                    <span id="timer-days" class="text-4xl md:text-6xl font-serif text-gray-900 mb-1">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-500 uppercase tracking-widest">Days</span>
+                </div>
+                <span class="text-4xl md:text-6xl font-serif text-gray-300">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="timer-hours" class="text-4xl md:text-6xl font-serif text-gray-900 mb-1">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-500 uppercase tracking-widest">Hours</span>
+                </div>
+                <span class="text-4xl md:text-6xl font-serif text-gray-300">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="timer-mins" class="text-4xl md:text-6xl font-serif text-gray-900 mb-1">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-500 uppercase tracking-widest">Mins</span>
+                </div>
+                <span class="text-4xl md:text-6xl font-serif text-gray-300">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="timer-secs" class="text-4xl md:text-6xl font-serif text-gold-500 mb-1">00</span>
+                    <span class="text-[10px] md:text-xs text-gray-500 uppercase tracking-widest">Secs</span>
+                </div>
+            </div>
+
+            <button onclick="openCurtains()" class="mt-12 text-xs text-gray-400 hover:text-gold-500 uppercase tracking-widest transition-colors border-b border-transparent hover:border-gold-400 flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M247.31 124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57 61.26 162.88 48 128 48S61.43 61.26 36.34 86.35C17.51 105.18 9 124 8.69 124.76a8 8 0 0 0 0 6.48c.35.79 8.82 19.58 27.65 38.41C61.43 194.74 93.12 208 128 208s66.57-13.26 91.66-38.35c18.83-18.83 27.3-37.62 27.65-38.41a8 8 0 0 0 0-6.48ZM128 192c-30.78 0-57.67-11.19-79.93-33.25A133.47 133.47 0 0 1 25 128a133.33 133.33 0 0 1 23.07-30.75C70.33 75.19 97.22 64 128 64s57.67 11.19 79.93 33.25A133.46 133.46 0 0 1 231 128c-7.23 13.47-53.53 64-103 64Zm0-112a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48Zm0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32Z"/></svg>
+                Sneak Peek
+            </button>
+        </div>
+    </div>
+    <!-- ================= END CURTAIN ================= -->
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-40 transition-all duration-300 py-4">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center">
+            <a href="#" class="text-3xl font-serif font-bold tracking-wider text-gold-gradient">BUNETTO.</a>
+
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#bunetto-signature" class="text-sm font-semibold tracking-widest uppercase text-gray-600 hover:text-gold-500 transition-colors">Signature</a>
+                <a href="#category-nav-wrapper" class="text-sm font-semibold tracking-widest uppercase text-gray-600 hover:text-gold-500 transition-colors">Menu</a>
+                <a href="#menu-beverages" class="text-sm font-semibold tracking-widest uppercase text-gray-600 hover:text-gold-500 transition-colors">Drinks</a>
+            </div>
+
+            <button onclick="toggleCart()" class="relative p-2 group bg-white rounded-full border border-gray-200 hover:border-gold-400 transition-all shadow-sm active:scale-95">
+                <svg width="24" height="24" viewBox="0 0 256 256" class="text-gray-800 group-hover:text-gold-500 transition-colors"><path fill="currentColor" d="M216 64h-40v-8a48 48 0 0 0-96 0v8H40a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16Zm-120-8a32 32 0 0 1 64 0v8H96Zm120 152H40V80h176v128Zm-88-72a32 32 0 0 1-32-32a8 8 0 0 1 16 0a16 16 0 0 0 32 0a8 8 0 0 1 16 0a32 32 0 0 1-32 32Z"/></svg>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-gold-400 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center transform scale-0 transition-transform duration-300">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Carousel) -->
+    <section id="hero-carousel" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Content Slides -->
+        <div id="hero-slides">
+            <!-- Slide 1: Classic Beef -->
+            <div class="hero-carousel-item active">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1500&auto=format&fit=crop" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 hero-carousel-overlay z-10"></div>
+                </div>
+                <div class="relative z-20 max-w-7xl mx-auto px-6 h-full flex flex-col items-center justify-center text-center">
+                    <p class="text-gold-400 tracking-[0.3em] text-sm uppercase mb-4 reveal-text font-bold">Standard of Excellence</p>
+                    <h1 class="text-5xl md:text-8xl font-serif font-bold text-white mb-6 reveal-text" style="transition-delay: 0.1s;">Classic <span class="text-gold-gradient italic">Beef.</span></h1>
+                    <p class="text-white/80 text-lg mb-10 max-w-2xl reveal-text" style="transition-delay: 0.2s;">Juicy grilled beef patty, fresh lettuce, tomatoes, onions, creamy mayo & signature house sauce.</p>
+                    <button onclick="openProductModal('beef1', event)" class="bg-gold-gradient text-white font-bold px-10 py-5 uppercase tracking-widest text-sm shadow-xl hover:scale-105 transition-transform reveal-text" style="transition-delay: 0.3s;">Explore Menu</button>
+                </div>
+            </div>
+
+            <!-- Slide 2: Megaton -->
+            <div class="hero-carousel-item">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=1500&auto=format&fit=crop" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 hero-carousel-overlay z-10"></div>
+                </div>
+                <div class="relative z-20 max-w-7xl mx-auto px-6 h-full flex flex-col items-center justify-center text-center">
+                    <p class="text-gold-400 tracking-[0.3em] text-sm uppercase mb-4 font-bold">The Ultimate Experience</p>
+                    <h1 class="text-5xl md:text-8xl font-serif font-bold text-white mb-6">Bunetto <span class="text-gold-gradient italic">Megaton.</span></h1>
+                    <p class="text-white/80 text-lg mb-10 max-w-2xl">Double patties, double cheese, crispy onions & fully loaded signature sauces.</p>
+                    <button onclick="openProductModal('beef3', event)" class="bg-gold-gradient text-white font-bold px-10 py-5 uppercase tracking-widest text-sm shadow-xl hover:scale-105 transition-transform">Order Now</button>
+                </div>
+            </div>
+
+            <!-- Slide 3: Smoky Zing -->
+            <div class="hero-carousel-item">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=1500&auto=format&fit=crop" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 hero-carousel-overlay z-10"></div>
+                </div>
+                <div class="relative z-20 max-w-7xl mx-auto px-6 h-full flex flex-col items-center justify-center text-center">
+                    <p class="text-gold-400 tracking-[0.3em] text-sm uppercase mb-4 font-bold">Smoky & Crispy</p>
+                    <h1 class="text-5xl md:text-8xl font-serif font-bold text-white mb-6">Smoky <span class="text-gold-gradient italic">Zing.</span></h1>
+                    <p class="text-white/80 text-lg mb-10 max-w-2xl">Premium zing patty, smoky BBQ sauce, cheese & crispy lettuce.</p>
+                    <div class="flex gap-4">
+                        <button onclick="openProductModal('zg2', event)" class="bg-gold-gradient text-white font-bold px-10 py-5 uppercase tracking-widest text-sm shadow-xl hover:scale-105 transition-transform">Order Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carousel Navigation Dots -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+            <div class="h-1 w-8 bg-gold-400 cursor-pointer transition-all duration-300 rounded-full" onclick="setHeroSlide(0)"></div>
+            <div class="h-1 w-8 bg-white/30 cursor-pointer transition-all duration-300 rounded-full" onclick="setHeroSlide(1)"></div>
+            <div class="h-1 w-8 bg-white/30 cursor-pointer transition-all duration-300 rounded-full" onclick="setHeroSlide(2)"></div>
+        </div>
+    </section>
+
+    <!-- Bunetto Signature Section (Replaces Best Sellers) -->
+    <section id="bunetto-signature" class="py-10 bg-gray-50 relative border-t border-gray-200">
+        <div class="max-w-4xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-8 reveal-text">
+                <p class="text-gold-500 tracking-[0.2em] text-sm uppercase mb-1 font-semibold">Top Picks</p>
+                <h2 class="text-3xl md:text-5xl font-serif font-bold text-gray-900">BUNETTO <span class="text-gold-gradient italic">SIGNATURE</span></h2>
+                <div class="w-16 h-1 bg-gold-gradient mx-auto mt-4"></div>
+            </div>
+            
+            <div class="bg-white border border-gray-200 rounded-xl p-2 md:p-6 shadow-lg reveal-text">
+                <div id="list-signature" class="grid grid-cols-3 gap-2 md:gap-5 w-full"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Horizontal Category Navigation -->
+    <div id="category-nav-wrapper" class="bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-[60px] md:top-[68px] z-30 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <div id="category-nav" class="flex overflow-x-auto gap-2 md:gap-3 py-3 no-scrollbar scroll-smooth">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- DYNAMIC MENU CONTAINER -->
+    <div id="menu-container" class="bg-white relative overflow-hidden pb-6">
+        <!-- JS dynamically injects categories here -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 pt-16 pb-8 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-10 mb-12 text-center md:text-left">
+                <div>
+                    <h4 class="text-3xl font-serif font-bold text-gold-gradient mb-3">BUNETTO.</h4>
+                    <p class="text-gray-600 text-sm mb-4 max-w-xs mx-auto md:mx-0 leading-relaxed">Redefining fast food. Elevating the burger experience through uncompromising quality and luxury ingredients.</p>
+                </div>
+                <div>
+                    <h4 class="font-serif text-lg mb-4 text-gray-900 font-bold">Visit Us</h4>
+                    <p class="text-gray-600 text-sm mb-1">Food District</p>
+                    <p class="text-gray-600 text-sm mb-4">Pakistan</p>
+                    <p class="text-gold-600 text-sm font-bold">Open Daily: 12 PM - 12 AM</p>
+                </div>
+                <div>
+                    <h4 class="font-serif text-lg mb-4 text-gray-900 font-bold">Contact</h4>
+                    <p class="text-gray-600 text-sm mb-2">Order Now via WhatsApp</p>
+                    <a href="https://wa.me/923012343423" target="_blank" class="text-gold-500 text-xl font-serif hover:text-gold-600 transition-colors block mb-4 font-bold">+92 301 2343423</a>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-6 text-center">
+                <p class="text-gray-500 text-xs tracking-wider">&copy; 2026 Bunetto Premium Burgers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PRODUCT DETAILS MODAL -->
+    <div id="product-modal" class="backdrop fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeProductModal()"></div>
+        <div class="modal-popup bg-white rounded-2xl w-full max-w-md overflow-hidden z-10 shadow-2xl relative flex flex-col max-h-[90vh]">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center z-20 hover:bg-black/70 transition">
+                <svg width="14" height="14" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
+            </button>
+            
+            <div class="h-48 md:h-56 shrink-0 relative bg-gray-100">
+                <img id="pm-img" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            </div>
+            
+            <div class="p-5 flex-1 overflow-y-auto no-scrollbar">
+                <h3 id="pm-title" class="text-2xl font-serif font-bold text-gray-900 mb-1">Product Title</h3>
+                <p id="pm-desc" class="text-sm text-gray-500 mb-3 leading-relaxed"></p>
+                <div class="font-bold text-gold-600 text-lg mb-6">Rs. <span id="pm-price">0</span></div>
+
+                <!-- Extras Section -->
+                <div id="pm-extras-container" class="space-y-3 mb-2 hidden">
+                    <h4 class="font-bold text-xs text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">Add Extras</h4>
+                    
+                    <div id="pm-extra-cheese" class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <div>
+                            <p class="text-gray-900 text-sm font-bold">Cheese Slice</p>
+                            <p class="text-gold-500 text-xs font-bold">+Rs. 70</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="updateModalExtra('cheese', -1)" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all"><svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg></button>
+                            <span id="pm-qty-cheese" class="w-4 text-center font-bold text-sm select-none text-gray-900">0</span>
+                            <button onclick="updateModalExtra('cheese', 1)" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all"><svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg></button>
+                        </div>
+                    </div>
+                    
+                    <div id="pm-extra-sauce" class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <div>
+                            <p class="text-gray-900 text-sm font-bold">Extra Sauce</p>
+                            <p class="text-gold-500 text-xs font-bold">+Rs. 100</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="updateModalExtra('sauce', -1)" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all"><svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg></button>
+                            <span id="pm-qty-sauce" class="w-4 text-center font-bold text-sm select-none text-gray-900">0</span>
+                            <button onclick="updateModalExtra('sauce', 1)" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all"><svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Quantity Selector -->
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 mt-6 shadow-inner">
+                    <span class="text-gray-900 font-serif font-bold text-lg">Quantity</span>
+                    <div class="flex items-center gap-4">
+                        <button onclick="updateModalProductQty(-1)" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all font-bold text-xl">-</button>
+                        <span id="pm-qty" class="w-6 text-center font-bold text-xl select-none text-gray-900">1</span>
+                        <button onclick="updateModalProductQty(1)" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all font-bold text-xl">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-gray-100 bg-white">
+                <button onclick="confirmModalAdd(event)" class="w-full bg-gold-gradient text-white font-bold py-4 rounded-md uppercase tracking-wider text-sm shadow-[0_4px_15px_rgba(212,175,55,0.3)] active:scale-95 transition-all flex justify-between px-6 items-center">
+                    <span>Add to Order</span>
+                    <span id="pm-total">Rs. 0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer Overlays & UI -->
+    <div id="cart-backdrop" class="backdrop fixed inset-0 bg-black/60 backdrop-blur-sm z-[80]" onclick="toggleCart()"></div>
+    
+    <div id="cart-drawer" class="side-drawer fixed top-0 right-0 w-full md:w-[450px] h-full bg-white border-l border-gray-200 z-[90] flex flex-col shadow-2xl">
+        <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-white">
+            <h2 class="text-2xl font-serif text-gold-gradient font-bold">Your Order</h2>
+            <button onclick="toggleCart()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors">
+                <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
+            </button>
+        </div>
+
+        <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50"></div>
+
+        <div class="p-5 border-t border-gray-200 bg-white shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
+            <div class="mb-4">
+                <label class="text-gray-600 text-xs uppercase tracking-widest mb-2 block font-bold">Order Type</label>
+                <div class="relative">
+                    <select id="order-type" onchange="updateCartUI()" class="w-full bg-white border border-gray-300 text-gray-900 rounded-md p-3 pr-10 text-sm outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400 transition-all cursor-pointer appearance-none font-medium">
+                        <option value="pickup">Pickup (Free)</option>
+                        <option value="delivery">Delivery (+Rs. 150)</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
+                        <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80A8 8 0 0 1 53.66 90.34L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div id="delivery-fee-row" class="flex justify-between items-center mb-2 hidden">
+                <span class="text-gray-600 text-sm font-medium">Delivery Fee</span>
+                <span class="text-gray-900 text-sm font-bold">Rs. 150</span>
+            </div>
+
+            <div class="flex justify-between items-center mb-5 border-t border-gray-100 pt-4">
+                <span class="text-gray-600 uppercase text-xs tracking-widest font-bold">Total Amount</span>
+                <span id="cart-total" class="text-3xl font-serif text-gray-900 font-bold">Rs. 0</span>
+            </div>
+            
+            <button onclick="checkoutWhatsApp()" class="w-full bg-gold-gradient text-white font-bold py-4 rounded-md uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(212,175,55,0.3)] active:scale-95 transition-all">
+                <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M187.58 144.84l-32-16a8 8 0 0 0-8 1.5l-19.29 19.3a89.73 89.73 0 0 1-39.45-39.45l19.3-19.29a8 8 0 0 0 1.5-8l-16-32A8 8 0 0 0 86.46 44c-13.61 2-22.46 14.41-22.46 28c0 82.72 67.28 150 150 150c13.59 0 26-8.85 28-22.46a8 8 0 0 0-6.87-8.7A239.38 239.38 0 0 1 128 64a240.54 240.54 0 0 1 85.08 15.63a8 8 0 0 0 10.38-4.46a8 8 0 0 0-4.46-10.38A256.49 256.49 0 0 0 128 48a255.45 255.45 0 0 0-80.4 13C33 65.57 24 81 24 99.88c0 97 79 176 176 176c18.88 0 34.31-9 38.86-23.64A23.94 23.94 0 0 0 215 220l-16-32Z"/></svg>
+                Order via WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- View All Full Screen Modal -->
+    <div id="view-all-modal" class="fixed inset-0 z-[60] bg-white flex flex-col h-[100dvh]">
+        <div class="p-5 border-b border-gray-200 bg-white/95 backdrop-blur-md flex justify-between items-center sticky top-0 z-10 shadow-sm">
+            <div>
+                <p class="text-gold-500 tracking-[0.2em] text-[10px] font-bold uppercase mb-1">Complete Collection</p>
+                <h2 id="modal-title" class="text-xl md:text-2xl font-serif font-bold text-gray-900 capitalize">All Items</h2>
+            </div>
+            <button onclick="closeViewAll()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors">
+                <svg width="18" height="18" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5 md:p-8 bg-gray-50 custom-scrollbar">
+            <!-- Grid layout for modal viewing -->
+            <div id="modal-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-7xl mx-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- TIMER & CURTAIN ---
+        function initTimerAndCurtains() {
+            const openingDate = new Date('2026-04-10T12:00:00+05:00');
+
+            const dEl = document.getElementById('timer-days'), hEl = document.getElementById('timer-hours'),
+                  mEl = document.getElementById('timer-mins'), sEl = document.getElementById('timer-secs');
+
+            const timerInterval = setInterval(() => {
+                const distance = openingDate.getTime() - new Date().getTime();
+                if (distance < 0) { clearInterval(timerInterval); openCurtains(); return; }
+                dEl.textContent = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
+                hEl.textContent = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                mEl.textContent = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                sEl.textContent = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+            }, 1000);
+        }
+
+        function openCurtains() {
+            document.getElementById('curtain-content').classList.add('hide');
+            setTimeout(() => {
+                document.getElementById('curtain-left').classList.add('open');
+                document.getElementById('curtain-right').classList.add('open');
+                document.body.classList.remove('locked');
+            }, 400);
+            setTimeout(() => document.getElementById('opening-curtain').style.display = 'none', 1900);
+        }
+
+        // --- HERO CAROUSEL ---
+        let currentHeroSlide = 0;
+        let heroInterval;
+
+        function setHeroSlide(index) {
+            const slides = document.querySelectorAll('.hero-carousel-item');
+            const dots = document.querySelectorAll('#hero-carousel .rounded-full');
+            
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => {
+                d.classList.remove('bg-gold-400', 'w-8');
+                d.classList.add('bg-white/30', 'w-4');
+            });
+
+            currentHeroSlide = index;
+            slides[currentHeroSlide].classList.add('active');
+            dots[currentHeroSlide].classList.add('bg-gold-400', 'w-8');
+            dots[currentHeroSlide].classList.remove('bg-white/30', 'w-4');
+
+            // Reset Interval
+            clearInterval(heroInterval);
+            startHeroAutoRotate();
+        }
+
+        function startHeroAutoRotate() {
+            heroInterval = setInterval(() => {
+                let next = (currentHeroSlide + 1) % 3;
+                setHeroSlide(next);
+            }, 5000);
+        }
+
+        // --- MENU DATA ---
+        // Extras removed per user instructions
+        let menuData;
+
+        let signatureIds;
+        let allProducts = [];
+        
+        let cart = [];
+        const WHATSAPP_NUMBER = "923012343423"; 
+
+        // --- DYNAMIC LAYOUT CONFIG ---
+        let categoryConfig;
+
+        categoryConfig.forEach(cat => {
+            const count = menuData[cat.id].length;
+            if (cat.id === 'beverages') cat.type = 'list';
+            else if (cat.id === 'zinger' || cat.id === 'fries') cat.type = 'carousel';
+            else if (count > 4) cat.type = 'carousel';
+            else if (count === 4) cat.type = 'grid';
+            else cat.type = 'list';
+        });
+
+        // --- DYNAMIC RENDERING ---
+        function renderCategoryNav() {
+            const navContainer = document.getElementById('category-nav');
+            let html = '';
+            categoryConfig.forEach(cat => {
+                html += `<a href="#menu-${cat.id}" class="snap-start shrink-0 px-4 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-[13px] md:text-sm font-semibold text-gray-700 hover:bg-gold-500 hover:text-white hover:border-gold-500 transition-colors whitespace-nowrap">${cat.title}</a>`;
+            });
+            navContainer.innerHTML = html;
+        }
+
+        function renderAllCategories() {
+            const container = document.getElementById('menu-container');
+            let html = '';
+
+            categoryConfig.forEach((cat, index) => {
+                const borderClass = index > 0 ? 'border-t border-gray-200' : '';
+                
+                // Tighter Spacing applied here: py-8 instead of py-16, mb-4 instead of mb-10
+                const headerHtml = `
+                    <div class="flex justify-between items-end mb-4 border-b border-gray-100 pb-3 reveal-text">
+                        <div>
+                            <p class="text-gold-500 tracking-[0.2em] text-[10px] font-bold uppercase mb-1">${cat.subtitle}</p>
+                            <h2 class="text-2xl md:text-4xl font-serif font-bold text-gray-900">${cat.title}</h2>
+                        </div>
+                        <button onclick="openViewAll('${cat.id}')" class="text-gold-500 uppercase text-[10px] md:text-xs tracking-widest font-bold hover:text-gray-900 transition-colors flex items-center gap-1 group bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
+                            View All
+                            <svg width="14" height="14" viewBox="0 0 256 256" class="transform group-hover:translate-x-1 transition-transform"><path fill="currentColor" d="M221.66 133.66l-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32Z"/></svg>
+                        </button>
+                    </div>
+                `;
+
+                if (cat.type === 'carousel') {
+                    html += `
+                    <section id="menu-${cat.id}" class="py-8 relative ${borderClass}">
+                        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+                            ${headerHtml}
+                            <div class="relative w-[100vw] -ml-[50vw] left-1/2 py-2">
+                                <button onclick="scrollCarousel('${cat.id}', -1)" class="absolute left-1 sm:left-3 md:left-[5vw] lg:left-[10vw] top-1/2 -translate-y-1/2 z-[60] w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white text-gold-500 flex items-center justify-center shadow-md active:scale-90 transition-transform">
+                                    <svg width="20" height="20" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg>
+                                </button>
+                                <div id="track-${cat.id}" class="carousel-track"></div>
+                                <button onclick="scrollCarousel('${cat.id}', 1)" class="absolute right-1 sm:right-3 md:right-[5vw] lg:right-[10vw] top-1/2 -translate-y-1/2 z-[60] w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white text-gold-500 flex items-center justify-center shadow-md active:scale-90 transition-transform">
+                                    <svg width="20" height="20" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128L90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </section>`;
+                } else if (cat.type === 'grid') {
+                    html += `
+                    <section id="menu-${cat.id}" class="py-8 relative ${borderClass}">
+                        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+                            ${headerHtml}
+                            <div id="grid-${cat.id}" class="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 snap-x snap-mandatory no-scrollbar"></div>
+                        </div>
+                    </section>`;
+                } else if (cat.type === 'list') {
+                    html += `
+                    <section id="menu-${cat.id}" class="py-8 relative bg-gray-50 ${borderClass}">
+                        <div class="max-w-4xl mx-auto px-6 lg:px-8">
+                            <div class="text-center mb-6 reveal-text">
+                                <p class="text-gold-500 tracking-[0.2em] text-[10px] font-bold uppercase mb-1">${cat.subtitle}</p>
+                                <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900">${cat.title}</h2>
+                                <div class="w-12 h-1 bg-gold-gradient mx-auto mt-3"></div>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded-xl p-4 md:p-6 shadow-md">
+                                <div id="list-${cat.id}" class="flex flex-col"></div>
+                            </div>
+                        </div>
+                    </section>`;
+                }
+            });
+
+            container.innerHTML = html;
+
+            categoryConfig.forEach(cat => {
+                if (cat.type === 'carousel') initNativeCarousel(cat.id);
+                else if (cat.type === 'grid') renderGrid(cat.id);
+                else if (cat.type === 'list') renderList(cat.id);
+            });
+        }
+
+        // --- CART UI ENGINE ---
+        function triggerPopBadge() {
+            const countBadge = document.getElementById('cart-count');
+            countBadge.classList.remove('animate-badge-pop');
+            void countBadge.offsetWidth;
+            countBadge.classList.add('animate-badge-pop');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            if (totalItems > 0) countBadge.classList.remove('scale-0');
+            else countBadge.classList.add('scale-0');
+        }
+
+        function spawnParticle(event, text) {
+            if(!event) return;
+            const el = document.createElement('div');
+            el.className = 'particle text-gold-500 font-bold text-xl fixed z-[9999] pointer-events-none drop-shadow-md';
+            el.textContent = text;
+            
+            // Accurately capture click or touch event position for floating particle
+            const x = event.clientX || (event.touches && event.touches[0].clientX) || window.innerWidth / 2;
+            const y = event.clientY || (event.touches && event.touches[0].clientY) || window.innerHeight / 2;
+            
+            el.style.left = `${x - 10}px`;
+            el.style.top = `${y - 20}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800); 
+        }
+
+        function getCartButtonHTML(id) {
+            const instances = cart.filter(c => c.id === id);
+            const totalQty = instances.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalQty > 0) {
+                // If in cart, show quantity selector
+                // We affect the first instance found for simple +/- actions on card
+                const targetInstanceId = instances[0].instanceId;
+                return `
+                    <div class="flex items-center bg-gold-gradient rounded-full h-10 px-1 shadow-md text-white z-20 transition-all border border-gold-500" onclick="event.stopPropagation()">
+                        <button onclick="updateQuantity('${targetInstanceId}', -1, event)" class="w-8 h-8 flex items-center justify-center font-bold hover:bg-black/10 rounded-full transition-colors active:scale-90">
+                            <svg width="14" height="14" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg>
+                        </button>
+                        <span class="w-7 text-center font-bold text-sm select-none">${totalQty}</span>
+                        <button onclick="updateQuantity('${targetInstanceId}', 1, event)" class="w-8 h-8 flex items-center justify-center font-bold hover:bg-black/10 rounded-full transition-colors active:scale-90">
+                            <svg width="14" height="14" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
+                        </button>
+                    </div>
+                `;
+            } else {
+                return `
+                    <button onclick="openProductModal('${id}', event)" class="w-full bg-gold-gradient text-white text-[10px] md:text-xs font-bold py-2 md:py-2.5 px-4 rounded-full uppercase tracking-wider transition-all shadow-sm z-20 active:scale-95 whitespace-nowrap">
+                        Add to Cart
+                    </button>
+                `;
+            }
+        }
+
+        function syncCartButtons() {
+            document.querySelectorAll('.cart-btn-wrapper').forEach(wrapper => {
+                wrapper.innerHTML = getCartButtonHTML(wrapper.getAttribute('data-id'));
+            });
+        }
+
+        // --- HTML TEMPLATES ---
+        function generateGridItemHTML(product) {
+            const descHtml = product.desc ? `<p class="text-[9px] md:text-xs text-gray-500 line-clamp-1 md:line-clamp-2 mt-1 leading-tight">${product.desc}</p>` : '';
+            return `
+                <div class="menu-card bg-white border border-gray-100 p-2 md:p-4 rounded-lg md:rounded-xl relative group flex flex-col h-full shadow-sm hover:shadow-md transition-shadow cursor-pointer w-full overflow-hidden" onclick="openProductModal('${product.id}', event)">
+                    <div class="h-20 sm:h-32 md:h-40 overflow-hidden mb-2 relative rounded-md shrink-0">
+                        <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif text-[11px] sm:text-[14px] md:text-[17px] text-gray-900 group-hover:text-gold-600 font-bold transition-colors line-clamp-1 md:line-clamp-2 leading-tight">${product.name}</h3>
+                            ${descHtml}
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-2 pt-2 border-t border-gray-100 gap-1">
+                            ${product.discountPrice ? '<span class="text-gray-400 line-through text-[9px] sm:text-[10px] mr-1">Rs.' + product.price + '</span><span class="text-gold-600 font-bold text-[10px] sm:text-xs md:text-base tracking-wide">Rs.' + product.discountPrice + '</span>' : '<span class="text-gold-600 font-bold text-[10px] sm:text-xs md:text-base tracking-wide">Rs. ' + product.price + '</span>'}
+                            <div class="cart-btn-wrapper flex justify-end" data-id="${product.id}" onclick="event.stopPropagation()"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCardWrap(product) {
+            const descHtml = product.desc ? `<p class="text-xs text-gray-500 line-clamp-2 mt-1 leading-snug">${product.desc}</p>` : '';
+            return `
+                <div class="carousel-item-wrap w-[220px] md:w-[300px]">
+                    <div class="menu-card bg-white border border-gray-100 p-3 md:p-4 rounded-xl relative group flex flex-col h-[350px] md:h-[380px] shadow-md mx-auto w-full cursor-pointer" onclick="openProductModal('${product.id}', event)">
+                        <div class="h-32 md:h-40 overflow-hidden mb-3 relative rounded-lg shrink-0">
+                            <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 flex flex-col justify-between pointer-events-auto">
+                            <div>
+                                <h3 class="font-serif text-[16px] md:text-[18px] text-gray-900 group-hover:text-gold-600 font-bold transition-colors line-clamp-2 leading-snug">${product.name}</h3>
+                                ${descHtml}
+                            </div>
+                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                                ${product.discountPrice ? '<span class="text-gray-400 line-through text-xs mr-2">Rs.' + product.price + '</span><span class="text-gold-600 font-bold text-base tracking-wide">Rs.' + product.discountPrice + '</span>' : '<span class="text-gold-600 font-bold text-base tracking-wide">Rs. ' + product.price + '</span>'}
+                                <div class="cart-btn-wrapper flex justify-end" data-id="${product.id}" onclick="event.stopPropagation()"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateListItemHTML(product, isLast) {
+            const descHtml = product.desc ? `<p class="text-[11px] md:text-xs text-gray-500 line-clamp-1 mt-0.5">${product.desc}</p>` : '';
+            return `
+                <div class="flex items-center gap-3 md:gap-4 py-3 md:py-4 ${!isLast ? 'border-b border-gray-100' : ''} hover:bg-gray-50 transition-colors rounded-lg px-1 md:px-2 group cursor-pointer" onclick="openProductModal('${product.id}', event)">
+                    <div class="relative w-14 h-14 md:w-16 md:h-16 shrink-0">
+                        <div class="absolute inset-0 bg-gold-500/20 rounded-md opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none"></div>
+                        <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover rounded-md border border-gray-200 shadow-sm">
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-gray-900 font-serif text-sm md:text-base font-bold transition-colors group-hover:text-gold-600">${product.name}</h4>
+                        ${descHtml}
+                        ${product.discountPrice ? '<p class="mt-0.5"><span class="text-gray-400 line-through text-[10px] sm:text-xs mr-2">Rs.' + product.price + '</span><span class="text-gold-600 font-bold text-xs md:text-sm">Rs.' + product.discountPrice + '</span></p>' : '<p class="text-gold-600 font-bold text-xs md:text-sm mt-0.5">Rs. ' + product.price + '</p>'}
+                    </div>
+                    <div class="cart-btn-wrapper flex justify-end items-center shrink-0" data-id="${product.id}" onclick="event.stopPropagation()"></div>
+                </div>
+            `;
+        }
+
+        // --- ENGINES ---
+        function initNativeCarousel(categoryId) {
+            const track = document.getElementById(`track-${categoryId}`);
+            const items = menuData[categoryId];
+            
+            const repeatedItems = [...items, ...items, ...items, ...items];
+            track.innerHTML = repeatedItems.map(p => generateCardWrap(p)).join('');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                    else entry.target.classList.remove('active');
+                });
+            }, { root: track, threshold: 0.6 });
+
+            track.querySelectorAll('.carousel-item-wrap').forEach(el => observer.observe(el));
+
+            let interval = setInterval(() => scrollCarousel(categoryId, 1), 3500);
+            
+            track.addEventListener('mouseenter', () => clearInterval(interval));
+            track.addEventListener('mouseleave', () => {
+                clearInterval(interval);
+                interval = setInterval(() => scrollCarousel(categoryId, 1), 3500);
+            });
+            track.addEventListener('touchstart', () => clearInterval(interval), {passive: true});
+
+            let isResetting = false;
+            track.addEventListener('scroll', () => {
+                if(track.children.length < 2 || isResetting) return;
+                
+                const singleItemWidth = track.children[1].offsetLeft - track.children[0].offsetLeft;
+                const setWidth = items.length * singleItemWidth;
+                
+                if (setWidth <= 0) return; 
+                
+                if (track.scrollLeft > setWidth * 2.5) {
+                    isResetting = true;
+                    track.style.scrollBehavior = 'auto';
+                    track.scrollLeft -= setWidth;
+                    requestAnimationFrame(() => {
+                        track.style.scrollBehavior = 'smooth';
+                        isResetting = false;
+                    });
+                }
+                else if (track.scrollLeft < setWidth * 0.5) {
+                    isResetting = true;
+                    track.style.scrollBehavior = 'auto';
+                    track.scrollLeft += setWidth;
+                    requestAnimationFrame(() => {
+                        track.style.scrollBehavior = 'smooth';
+                        isResetting = false;
+                    });
+                }
+            });
+
+            setTimeout(() => {
+                const singleItemWidth = track.children.length > 1 ? Math.max(track.children[1].offsetLeft - track.children[0].offsetLeft, 220) : 220;
+                track.style.scrollBehavior = 'auto';
+                track.scrollLeft = (items.length * 2) * singleItemWidth; 
+                requestAnimationFrame(() => track.style.scrollBehavior = 'smooth');
+            }, 300);
+        }
+
+        function scrollCarousel(categoryId, direction) {
+            const track = document.getElementById(`track-${categoryId}`);
+            if(!track.children.length) return;
+            const cardWidthWithGap = track.children[1].offsetLeft - track.children[0].offsetLeft;
+            track.scrollBy({ left: direction * cardWidthWithGap, behavior: 'smooth' });
+        }
+
+        function renderGrid(categoryId) {
+            const container = document.getElementById(`grid-${categoryId}`);
+            let html = '';
+            menuData[categoryId].forEach(p => { html += generateGridItemHTML(p); });
+            container.innerHTML = html;
+        }
+
+        function renderList(categoryId) {
+            const container = document.getElementById(`list-${categoryId}`);
+            let html = '';
+            const items = menuData[categoryId];
+            items.forEach((p, idx) => { html += generateListItemHTML(p, idx === items.length - 1); });
+            container.innerHTML = html;
+        }
+
+        function renderSignature() {
+            const container = document.getElementById('list-signature');
+            let html = '';
+            signatureIds.forEach((id) => {
+                const p = allProducts.find(x => x.id === id);
+                if (p) html += generateGridItemHTML(p);
+            });
+            container.innerHTML = html;
+        }
+
+        function openViewAll(categoryId) {
+            const modal = document.getElementById('view-all-modal');
+            const grid = document.getElementById('modal-grid');
+            const cat = categoryConfig.find(c => c.id === categoryId);
+            document.getElementById('modal-title').textContent = cat ? cat.title : 'Collection';
+            
+            grid.innerHTML = menuData[categoryId].map(p => generateGridItemHTML(p)).join('');
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            syncCartButtons(); 
+        }
+
+        function closeViewAll() {
+            document.getElementById('view-all-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- PRODUCT DETAILS MODAL ---
+        let activeModalProductId = null;
+        let modalExtras = { cheese: 0, sauce: 0 };
+        let activeModalBasePrice = 0;
+
+        function openProductModal(productId, event) {
+            if(event) event.stopPropagation();
+            activeModalProductId = productId;
+            modalExtras = { cheese: 0, sauce: 0 };
+            modalQty = 1; // reset qty when opening
+            
+            const product = allProducts.find(p => p.id === productId);
+            if(!product) return;
+
+            activeModalBasePrice = product.discountPrice || product.price;
+
+            document.getElementById('pm-img').src = product.img;
+            document.getElementById('pm-title').textContent = product.name;
+            document.getElementById('pm-desc').textContent = product.desc || '';
+            document.getElementById('pm-price').innerHTML = product.discountPrice ? '<span class="text-gray-400 line-through text-sm mr-2">' + product.price + '</span>' + product.discountPrice : product.price;
+
+            let group = '';
+            for (const cat of categoryConfig) {
+                if (menuData[cat.id]?.find(p => p.id === productId)) {
+                    group = cat.group; break;
+                }
+            }
+            
+            const extrasContainer = document.getElementById('pm-extras-container');
+            const cheeseRow = document.getElementById('pm-extra-cheese');
+            const sauceRow = document.getElementById('pm-extra-sauce');
+            
+            if (group === 'burger' || group === 'fries') {
+                extrasContainer.classList.remove('hidden');
+                cheeseRow.classList.remove('hidden');
+                sauceRow.classList.remove('hidden');
+            } else {
+                extrasContainer.classList.add('hidden');
+                cheeseRow.classList.add('hidden');
+                sauceRow.classList.add('hidden');
+            }
+
+            updateModalUI();
+
+            const modal = document.getElementById('product-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('product-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateModalExtra(type, delta) {
+            if (modalExtras[type] + delta >= 0) {
+                modalExtras[type] += delta;
+                updateModalUI();
+            }
+        }
+
+        let modalQty = 1;
+        function updateModalProductQty(delta) {
+            if (modalQty + delta >= 1) {
+                modalQty += delta;
+                updateModalUI();
+            }
+        }
+
+        function updateModalUI() {
+            document.getElementById('pm-qty-cheese').textContent = modalExtras.cheese;
+            document.getElementById('pm-qty-sauce').textContent = modalExtras.sauce;
+            if(document.getElementById('pm-qty')) {
+                document.getElementById('pm-qty').textContent = modalQty;
+            }
+            
+            let baseWithExtras = activeModalBasePrice + (modalExtras.cheese * 70) + (modalExtras.sauce * 100);
+            let total = baseWithExtras * modalQty;
+            document.getElementById('pm-total').textContent = `Rs. ${total}`;
+        }
+
+        function confirmModalAdd(event) {
+            const product = allProducts.find(p => p.id === activeModalProductId);
+            if(product) {
+                const selectedExtras = [];
+                if(modalExtras.cheese > 0) {
+                    const ex = menuData.extras.find(e => e.id === 'ex_cheese');
+                    selectedExtras.push({ ...ex, qty: modalExtras.cheese });
+                }
+                if(modalExtras.sauce > 0) {
+                    const ex = menuData.extras.find(e => e.id === 'ex_sauce');
+                    selectedExtras.push({ ...ex, qty: modalExtras.sauce });
+                }
+
+                // Check if an item with EXACT same extras already exists
+                const existingIndex = cart.findIndex(item => {
+                    if (item.id !== activeModalProductId) return false;
+                    if (item.extras.length !== selectedExtras.length) return false;
+                    return selectedExtras.every(se => {
+                        const match = item.extras.find(ie => ie.id === se.id);
+                        return match && match.qty === se.qty;
+                    });
+                });
+
+                if (existingIndex > -1) {
+                    cart[existingIndex].qty += modalQty;
+                } else {
+                    cart.push({
+                        ...product,
+                        instanceId: 'inst_' + Date.now() + Math.random(), 
+                        qty: modalQty,
+                        extras: selectedExtras
+                    });
+                }
+                
+                spawnParticle(event, '+1');
+                updateCartUI();
+            }
+            closeProductModal();
+        }
+
+        // Removed addDirectToCart since extras are now nested
+
+        // --- DIRECT ADD TO CART ---
+        function addToCart(productId, event) {
+            if(event) event.stopPropagation();
+            const product = allProducts.find(p => p.id === productId);
+            if(product) {
+                const itemIndex = cart.findIndex(item => item.id === productId && item.extras.length === 0);
+                if (itemIndex > -1) {
+                    cart[itemIndex].qty += 1;
+                } else {
+                    cart.push({ 
+                        ...product, 
+                        instanceId: 'inst_' + Date.now() + Math.random(),
+                        qty: 1, 
+                        extras: [] 
+                    });
+                }
+                spawnParticle(event, '+1');
+            }
+            updateCartUI();
+        }
+
+        function updateQuantity(instanceId, delta, event) {
+            if(event) event.stopPropagation();
+            const itemIndex = cart.findIndex(item => item.instanceId === instanceId);
+            if (itemIndex > -1) {
+                cart[itemIndex].qty += delta;
+                spawnParticle(event, delta > 0 ? '+1' : '-1');
+                if (cart[itemIndex].qty <= 0) cart.splice(itemIndex, 1);
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            const countEl = document.getElementById('cart-count');
+            const orderType = document.getElementById('order-type').value;
+            const deliveryFeeRow = document.getElementById('delivery-fee-row');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            countEl.textContent = totalItems;
+            triggerPopBadge(); 
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-gray-400 space-y-4 pt-20">
+                        <svg width="50" height="50" viewBox="0 0 256 256" class="opacity-30"><path fill="currentColor" d="M216 64h-40v-8a48 48 0 0 0-96 0v8H40a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16Zm-120-8a32 32 0 0 1 64 0v8H96Zm120 152H40V80h176v128Z"/></svg>
+                        <p class="text-xs uppercase tracking-widest font-bold">Your order is empty.</p>
+                    </div>
+                `;
+                totalEl.textContent = "Rs. 0";
+                deliveryFeeRow.classList.add('hidden');
+            } else {
+                let total = 0;
+                let deliveryFee = 0;
+                container.innerHTML = '';
+
+                cart.forEach(item => {
+                    let itemBaseTotal = (item.discountPrice || item.price) * item.qty;
+                    let extrasTotal = item.extras.reduce((sum, ex) => sum + (ex.price * ex.qty * item.qty), 0);
+                    let rowTotal = itemBaseTotal + extrasTotal;
+                    total += rowTotal;
+
+                    let extrasHtml = '';
+                    if (item.extras.length > 0) {
+                        extrasHtml = `
+                            <div class="mt-2 ml-4 border-l-2 border-gold-200 pl-3 space-y-1">
+                                ${item.extras.map(ex => `
+                                    <div class="text-[10px] md:text-xs text-gray-500 flex justify-between items-center">
+                                        <span>• ${ex.qty}x ${ex.name} (+Rs. ${ex.price * ex.qty})</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+
+                    container.innerHTML += `
+                        <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="flex gap-3 items-center">
+                                <img src="${item.img}" class="w-14 h-14 object-cover rounded-md border border-gray-100">
+                                <div class="flex-1">
+                                    <h4 class="text-gray-900 font-serif text-sm font-bold leading-tight line-clamp-1">${item.name}</h4>
+                                    <div class="text-gold-600 text-xs mt-0.5 font-bold">Rs. ${item.discountPrice || item.price}</div>
+                                    
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <button onclick="updateQuantity('${item.instanceId}', -1, event)" class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors active:scale-90">
+                                            <svg width="10" height="10" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg>
+                                        </button>
+                                        <span class="text-xs w-4 text-center text-gray-900 font-bold">${item.qty}</span>
+                                        <button onclick="updateQuantity('${item.instanceId}', 1, event)" class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors active:scale-90">
+                                            <svg width="10" height="10" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-gray-900 font-bold text-sm">Rs. ${rowTotal}</div>
+                                </div>
+                            </div>
+                            ${extrasHtml}
+                        </div>
+                    `;
+                });
+
+                if (orderType === 'delivery') {
+                    deliveryFee = 150;
+                    deliveryFeeRow.classList.remove('hidden');
+                } else {
+                    deliveryFeeRow.classList.add('hidden');
+                }
+
+                total += deliveryFee;
+                totalEl.textContent = `Rs. ${total}`;
+            }
+            syncCartButtons();
+        }
+
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const backdrop = document.getElementById('cart-backdrop');
+            drawer.classList.toggle('active');
+            backdrop.classList.toggle('active');
+            if(drawer.classList.contains('active')) document.body.style.overflow = 'hidden';
+            else document.body.style.overflow = 'auto';
+        }
+
+        function checkoutWhatsApp() {
+            if (cart.length === 0) {
+                alert("Please add items to your order first.");
+                return;
+            }
+
+            const orderType = document.getElementById('order-type').value;
+            const orderTypeLabel = orderType === 'delivery' ? 'Delivery' : 'Pickup';
+
+            let message = `Hello *Bunetto*! 🍔✨\nI'd like to place a *${orderTypeLabel}* order:\n\n`;
+            let total = 0;
+
+            cart.forEach(item => {
+                let itemBaseTotal = (item.discountPrice || item.price) * item.qty;
+                let extrasTotal = item.extras.reduce((sum, ex) => sum + (ex.price * ex.qty * item.qty), 0);
+                let rowTotal = itemBaseTotal + extrasTotal;
+                total += rowTotal;
+
+                message += `🍔 *${item.qty}x ${item.name}* - Rs. ${itemBaseTotal}\n`;
+                item.extras.forEach(ex => {
+                    message += `  └─ ${ex.qty * item.qty}x ${ex.name} (+Rs. ${ex.price * ex.qty * item.qty})\n`;
+                });
+            });
+
+            if (orderType === 'delivery') {
+                message += `▪ Delivery Fee - Rs. 150\n`;
+                total += 150;
+            }
+
+            message += `\n*Total Amount: Rs. ${total}*\n\n`;
+            
+            if (orderType === 'delivery') {
+                message += "Please let me know how I can make the payment and the estimated delivery time. Here is my delivery address:\n\n[Please enter your address here]\n\nThank you!";
+            } else {
+                message += "Please let me know how I can make the payment and when my order will be ready for pickup. Thank you!";
+            }
+
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function handleScroll() {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 30) nav.classList.add('nav-scrolled', 'py-2'), nav.classList.remove('py-4');
+            else nav.classList.remove('nav-scrolled', 'py-2'), nav.classList.add('py-4');
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+
+        try {
+            const res = await fetch('data.json');
+            if(res.ok) {
+                const data = await res.json();
+                menuData = data.menuData;
+                signatureIds = data.signatureIds;
+                categoryConfig = data.categoryConfig;
+                allProducts = Object.values(menuData).flat();
+            }
+        } catch(e) { console.error("Could not load data.json", e); }
+
+            initTimerAndCurtains();
+            startHeroAutoRotate();
+            
+            // Initialize Dynamic Content Engine
+            renderCategoryNav();
+            renderAllCategories();
+            renderSignature();
+            syncCartButtons();
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
+            window.addEventListener('scroll', handleScroll);
+        });
