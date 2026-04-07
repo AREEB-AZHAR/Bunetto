@@ -14,16 +14,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <script>
-        // Safely initialize tailwind config to prevent ReferenceError if CDN loads asynchronously
         window.tailwind = window.tailwind || {};
         window.tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         gold: { 400: '#D4AF37', 500: '#BF953F', 600: '#AA771C' },
-                        dark: '#050505',
-                        surface: '#111111',
-                        surfaceLight: '#1a1a1a'
+                        // Updated to Light Theme palette
+                        dark: '#ffffff', 
+                        surface: '#f9fafb', 
+                        surfaceLight: '#ffffff'
                     },
                     fontFamily: {
                         serif: ['"Playfair Display"', 'serif'],
@@ -36,43 +36,39 @@
 
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-track { background: #f3f4f6; }
         ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 4px; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         body {
-            background-color: #050505;
-            color: #ffffff;
+            background-color: #ffffff;
+            color: #111827; /* Gray-900 */
             overflow-x: hidden;
         }
 
-        /* Prevent scrolling while curtains are closed */
         body.locked {
             overflow: hidden;
             touch-action: none;
         }
 
         .text-gold-gradient {
-            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            background: linear-gradient(to right, #BF953F, #D4AF37, #AA771C);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            background-size: 200% auto;
-            animation: shine 5s linear infinite;
         }
 
         .bg-gold-gradient {
             background: linear-gradient(135deg, #BF953F 0%, #D4AF37 50%, #AA771C 100%);
         }
 
-        @keyframes shine { to { background-position: 200% center; } }
-
         /* --- CURTAIN ANIMATIONS --- */
         .curtain-panel {
             transition: transform 1.5s cubic-bezier(0.77, 0, 0.175, 1);
-            background: linear-gradient(90deg, #050505 0%, #111111 50%, #050505 100%);
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+            background: #ffffff;
         }
-        
         .curtain-left.open { transform: translateX(-100%); }
         .curtain-right.open { transform: translateX(100%); }
         
@@ -87,14 +83,14 @@
 
         .reveal-text {
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+            transform: translateY(15px);
+            transition: all 0.6s cubic-bezier(0.5, 0, 0, 1);
         }
         .reveal-text.active { opacity: 1; transform: translateY(0); }
 
         @keyframes float {
             0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(2deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
             100% { transform: translateY(0px) rotate(0deg); }
         }
         .floating-element { animation: float 6s ease-in-out infinite; }
@@ -115,12 +111,23 @@
         .carousel-track::before,
         .carousel-track::after {
             content: '';
-            flex: 0 0 calc(50vw - 120px); 
+            flex: 0 0 calc(50vw - 110px); 
+            margin-right: 1.5rem;
         }
         @media (min-width: 768px) {
             .carousel-track::before,
             .carousel-track::after {
-                flex: 0 0 calc(50vw - 160px); 
+                flex: 0 0 calc(50vw - 150px); 
+                margin-right: 2rem;
+            }
+        }
+
+        .carousel-track > * {
+            margin-right: 20px;
+        }
+        @media (max-width: 768px) {
+            .carousel-track > * {
+                margin-right: 40px;
             }
         }
         
@@ -128,9 +135,9 @@
             scroll-snap-align: center;
             flex-shrink: 0;
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            transform: scale(0.85);
-            filter: blur(4px);
-            opacity: 0.5;
+            transform: scale(0.88);
+            filter: blur(3px);
+            opacity: 0.6;
             pointer-events: none; 
         }
         
@@ -142,8 +149,10 @@
             z-index: 10;
         }
 
+        .menu-card { cursor: pointer; }
         .menu-card img { transition: transform 0.6s ease; }
-        .carousel-item-wrap.active .menu-card:hover img { transform: scale(1.08) rotate(2deg); }
+        .carousel-item-wrap.active .menu-card:hover img,
+        .menu-card:hover img { transform: scale(1.05) rotate(1deg); }
 
         /* --- ANIMATIONS FOR CART --- */
         @keyframes pop {
@@ -155,83 +164,95 @@
 
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-40px) scale(1.1); }
         }
         .particle {
-            position: fixed;
-            pointer-events: none;
-            font-weight: bold;
-            color: #D4AF37;
-            font-size: 1.25rem;
-            z-index: 9999;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.8);
             animation: floatUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
 
         /* Modals & Nav */
         .backdrop { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .backdrop.active { opacity: 1; pointer-events: auto; }
-        #cart-drawer { transform: translateX(100%); transition: transform 0.4s ease-in-out; }
-        #cart-drawer.active { transform: translateX(0); }
+        
+        .side-drawer { transform: translateX(100%); transition: transform 0.4s ease-in-out; }
+        .side-drawer.active { transform: translateX(0); }
+        
+        .modal-popup { transform: translateY(50px) scale(0.95); transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+        .backdrop.active .modal-popup { transform: translateY(0) scale(1); }
+
         #view-all-modal { transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.5, 0, 0, 1); }
         #view-all-modal.active { transform: translateY(0); }
         
         .nav-scrolled {
-            background: rgba(5, 5, 5, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-nav-link.active {
+            background-color: #D4AF37 !important;
+            color: #ffffff !important;
+            border-color: #D4AF37 !important;
+        }
+
+        /* --- HERO CAROUSEL STYLES --- */
+        .hero-carousel-item {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+        .hero-carousel-item.active {
+            opacity: 1;
+            z-index: 1;
+        }
+        .hero-carousel-overlay {
+            background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);
         }
     </style>
 </head>
-<body class="font-sans antialiased selection:bg-gold-500 selection:text-dark locked">
+<body class="font-sans antialiased selection:bg-gold-500 selection:text-white locked relative">
 
     <!-- ================= OPENING CURTAIN & TIMER ================= -->
     <div id="opening-curtain" class="fixed inset-0 z-[100] flex overflow-hidden">
-        <!-- Left Curtain -->
-        <div id="curtain-left" class="curtain-panel curtain-left w-1/2 h-full border-r border-gold-500/30 relative">
-            <!-- Decorative Gold Line -->
-            <div class="absolute right-0 top-0 bottom-0 w-[2px] bg-gold-gradient shadow-[0_0_15px_rgba(212,175,55,0.5)]"></div>
+        <div id="curtain-left" class="curtain-panel curtain-left w-1/2 h-full border-r border-gray-200 relative">
+            <div class="absolute right-0 top-0 bottom-0 w-[2px] bg-gold-gradient shadow-[0_0_15px_rgba(212,175,55,0.3)]"></div>
         </div>
-        
-        <!-- Right Curtain -->
-        <div id="curtain-right" class="curtain-panel curtain-right w-1/2 h-full border-l border-gold-500/30 relative">
-            <!-- Decorative Gold Line -->
-            <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-gold-gradient shadow-[0_0_15px_rgba(212,175,55,0.5)]"></div>
+        <div id="curtain-right" class="curtain-panel curtain-right w-1/2 h-full border-l border-gray-200 relative">
+            <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-gold-gradient shadow-[0_0_15px_rgba(212,175,55,0.3)]"></div>
         </div>
 
-        <!-- Timer Content Overlay -->
         <div id="curtain-content" class="absolute inset-0 flex flex-col items-center justify-center z-10 px-4">
-            <!-- Optimization: Replaced heavy backdrop-blur with solid dark overlay to free up GPU -->
-            <div class="absolute inset-0 bg-black/90 -z-10"></div>
+            <div class="absolute inset-0 bg-white/95 backdrop-blur-md -z-10"></div>
             
-            <h1 class="text-5xl md:text-8xl font-serif font-bold text-gold-gradient mb-2 drop-shadow-2xl">BUNETTO.</h1>
-            <p class="tracking-[0.4em] uppercase text-xs md:text-sm text-gold-400 mb-12 font-semibold">Grand Opening</p>
+            <h1 class="text-5xl md:text-8xl font-serif font-bold text-gold-gradient mb-2 drop-shadow-sm">BUNETTO.</h1>
+            <p class="tracking-[0.4em] uppercase text-xs md:text-sm text-gray-500 mb-10 font-semibold">Grand Opening</p>
             
-            <!-- Countdown Timer -->
-            <div class="flex gap-4 md:gap-8 text-center bg-dark/90 p-6 md:p-10 rounded-2xl border border-white/10 shadow-[0_0_50px_rgba(212,175,55,0.1)]">
+            <div class="flex gap-4 md:gap-8 text-center bg-gray-50/90 p-6 md:p-10 rounded-2xl border border-gray-200 shadow-[0_10px_40px_rgba(0,0,0,0.08)]">
                 <div class="flex flex-col items-center">
-                    <span id="timer-days" class="text-4xl md:text-6xl font-serif text-white mb-2">00</span>
-                    <span class="text-[10px] md:text-xs text-gold-400 uppercase tracking-widest">Days</span>
+                    <span id="timer-days" class="text-4xl md:text-6xl font-serif text-gray-900 mb-1">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-500 uppercase tracking-widest">Days</span>
                 </div>
-                <span class="text-4xl md:text-6xl font-serif text-white/20">:</span>
+                <span class="text-4xl md:text-6xl font-serif text-gray-300">:</span>
                 <div class="flex flex-col items-center">
-                    <span id="timer-hours" class="text-4xl md:text-6xl font-serif text-white mb-2">00</span>
-                    <span class="text-[10px] md:text-xs text-gold-400 uppercase tracking-widest">Hours</span>
+                    <span id="timer-hours" class="text-4xl md:text-6xl font-serif text-gray-900 mb-1">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-500 uppercase tracking-widest">Hours</span>
                 </div>
-                <span class="text-4xl md:text-6xl font-serif text-white/20">:</span>
+                <span class="text-4xl md:text-6xl font-serif text-gray-300">:</span>
                 <div class="flex flex-col items-center">
-                    <span id="timer-mins" class="text-4xl md:text-6xl font-serif text-white mb-2">00</span>
-                    <span class="text-[10px] md:text-xs text-gold-400 uppercase tracking-widest">Mins</span>
+                    <span id="timer-mins" class="text-4xl md:text-6xl font-serif text-gray-900 mb-1">00</span>
+                    <span class="text-[10px] md:text-xs text-gold-500 uppercase tracking-widest">Mins</span>
                 </div>
-                <span class="text-4xl md:text-6xl font-serif text-white/20">:</span>
+                <span class="text-4xl md:text-6xl font-serif text-gray-300">:</span>
                 <div class="flex flex-col items-center">
-                    <span id="timer-secs" class="text-4xl md:text-6xl font-serif text-gold-400 mb-2">00</span>
+                    <span id="timer-secs" class="text-4xl md:text-6xl font-serif text-gold-500 mb-1">00</span>
                     <span class="text-[10px] md:text-xs text-gray-500 uppercase tracking-widest">Secs</span>
                 </div>
             </div>
 
-            <!-- Bypass Button for Client Preview -->
-            <button onclick="openCurtains()" class="mt-16 text-xs text-gray-500 hover:text-gold-400 uppercase tracking-widest transition-colors border-b border-transparent hover:border-gold-400 flex items-center gap-2">
+            <button onclick="openCurtains()" class="mt-12 text-xs text-gray-400 hover:text-gold-500 uppercase tracking-widest transition-colors border-b border-transparent hover:border-gold-400 flex items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M247.31 124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57 61.26 162.88 48 128 48S61.43 61.26 36.34 86.35C17.51 105.18 9 124 8.69 124.76a8 8 0 0 0 0 6.48c.35.79 8.82 19.58 27.65 38.41C61.43 194.74 93.12 208 128 208s66.57-13.26 91.66-38.35c18.83-18.83 27.3-37.62 27.65-38.41a8 8 0 0 0 0-6.48ZM128 192c-30.78 0-57.67-11.19-79.93-33.25A133.47 133.47 0 0 1 25 128a133.33 133.33 0 0 1 23.07-30.75C70.33 75.19 97.22 64 128 64s57.67 11.19 79.93 33.25A133.46 133.46 0 0 1 231 128c-7.23 13.47-53.53 64-103 64Zm0-112a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48Zm0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32Z"/></svg>
                 Sneak Peek
             </button>
@@ -239,218 +260,241 @@
     </div>
     <!-- ================= END CURTAIN ================= -->
 
-
     <!-- Navigation -->
     <nav id="navbar" class="fixed w-full z-40 transition-all duration-300 py-4">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center">
             <a href="#" class="text-3xl font-serif font-bold tracking-wider text-gold-gradient">BUNETTO.</a>
 
             <div class="hidden md:flex space-x-8 items-center">
-                <a href="#best-sellers" class="text-sm tracking-widest uppercase hover:text-gold-400 transition-colors">Top Picks</a>
-                <a href="#menu-burgers" class="text-sm tracking-widest uppercase hover:text-gold-400 transition-colors">Menu</a>
-                <a href="#menu-beverages" class="text-sm tracking-widest uppercase hover:text-gold-400 transition-colors">Drinks</a>
+                <a href="#bunetto-signature" class="text-sm font-semibold tracking-widest uppercase text-gray-600 hover:text-gold-500 transition-colors">Signature</a>
+                <a href="#category-nav-wrapper" class="text-sm font-semibold tracking-widest uppercase text-gray-600 hover:text-gold-500 transition-colors">Menu</a>
+                <a href="#menu-beverages" class="text-sm font-semibold tracking-widest uppercase text-gray-600 hover:text-gold-500 transition-colors">Drinks</a>
             </div>
 
-            <button onclick="toggleCart()" class="relative p-2 group bg-surfaceLight rounded-full border border-white/10 hover:border-gold-400/50 transition-all shadow-lg active:scale-95">
-                <svg width="24" height="24" viewBox="0 0 256 256" class="text-white group-hover:text-gold-400 transition-colors"><path fill="currentColor" d="M216 64h-40v-8a48 48 0 0 0-96 0v8H40a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16Zm-120-8a32 32 0 0 1 64 0v8H96Zm120 152H40V80h176v128Zm-88-72a32 32 0 0 1-32-32a8 8 0 0 1 16 0a16 16 0 0 0 32 0a8 8 0 0 1 16 0a32 32 0 0 1-32 32Z"/></svg>
-                <span id="cart-count" class="absolute -top-1 -right-1 bg-gold-400 text-dark text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center transform scale-0 transition-transform duration-300">0</span>
+            <button onclick="toggleCart()" class="relative p-2 group bg-white rounded-full border border-gray-200 hover:border-gold-400 transition-all shadow-sm active:scale-95">
+                <svg width="24" height="24" viewBox="0 0 256 256" class="text-gray-800 group-hover:text-gold-500 transition-colors"><path fill="currentColor" d="M216 64h-40v-8a48 48 0 0 0-96 0v8H40a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16Zm-120-8a32 32 0 0 1 64 0v8H96Zm120 152H40V80h176v128Zm-88-72a32 32 0 0 1-32-32a8 8 0 0 1 16 0a16 16 0 0 0 32 0a8 8 0 0 1 16 0a32 32 0 0 1-32 32Z"/></svg>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-gold-400 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center transform scale-0 transition-transform duration-300">0</span>
             </button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-dark z-10 opacity-70"></div>
-            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gold-500 rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gold-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
+    <!-- Hero Section (Carousel) -->
+    <section id="hero-carousel" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Content Slides -->
+        <div id="hero-slides">
+            <!-- Slide 1: Classic Beef -->
+            <div class="hero-carousel-item active">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1500&auto=format&fit=crop" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 hero-carousel-overlay z-10"></div>
+                </div>
+                <div class="relative z-20 max-w-7xl mx-auto px-6 h-full flex flex-col items-center justify-center text-center">
+                    <p class="text-gold-400 tracking-[0.3em] text-sm uppercase mb-4 reveal-text font-bold">Standard of Excellence</p>
+                    <h1 class="text-5xl md:text-8xl font-serif font-bold text-white mb-6 reveal-text" style="transition-delay: 0.1s;">Classic <span class="text-gold-gradient italic">Beef.</span></h1>
+                    <p class="text-white/80 text-lg mb-10 max-w-2xl reveal-text" style="transition-delay: 0.2s;">Juicy grilled beef patty, fresh lettuce, tomatoes, onions, creamy mayo & signature house sauce.</p>
+                    <button onclick="openProductModal('beef1', event)" class="bg-gold-gradient text-white font-bold px-10 py-5 uppercase tracking-widest text-sm shadow-xl hover:scale-105 transition-transform reveal-text" style="transition-delay: 0.3s;">Explore Menu</button>
+                </div>
+            </div>
+
+            <!-- Slide 2: Megaton -->
+            <div class="hero-carousel-item">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=1500&auto=format&fit=crop" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 hero-carousel-overlay z-10"></div>
+                </div>
+                <div class="relative z-20 max-w-7xl mx-auto px-6 h-full flex flex-col items-center justify-center text-center">
+                    <p class="text-gold-400 tracking-[0.3em] text-sm uppercase mb-4 font-bold">The Ultimate Experience</p>
+                    <h1 class="text-5xl md:text-8xl font-serif font-bold text-white mb-6">Bunetto <span class="text-gold-gradient italic">Megaton.</span></h1>
+                    <p class="text-white/80 text-lg mb-10 max-w-2xl">Double patties, double cheese, crispy onions & fully loaded signature sauces.</p>
+                    <button onclick="openProductModal('beef3', event)" class="bg-gold-gradient text-white font-bold px-10 py-5 uppercase tracking-widest text-sm shadow-xl hover:scale-105 transition-transform">Order Now</button>
+                </div>
+            </div>
+
+            <!-- Slide 3: Smoky Zing -->
+            <div class="hero-carousel-item">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=1500&auto=format&fit=crop" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 hero-carousel-overlay z-10"></div>
+                </div>
+                <div class="relative z-20 max-w-7xl mx-auto px-6 h-full flex flex-col items-center justify-center text-center">
+                    <p class="text-gold-400 tracking-[0.3em] text-sm uppercase mb-4 font-bold">Smoky & Crispy</p>
+                    <h1 class="text-5xl md:text-8xl font-serif font-bold text-white mb-6">Smoky <span class="text-gold-gradient italic">Zing.</span></h1>
+                    <p class="text-white/80 text-lg mb-10 max-w-2xl">Premium zing patty, smoky BBQ sauce, cheese & crispy lettuce.</p>
+                    <div class="flex gap-4">
+                        <button onclick="openProductModal('zg2', event)" class="bg-gold-gradient text-white font-bold px-10 py-5 uppercase tracking-widest text-sm shadow-xl hover:scale-105 transition-transform">Order Now</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
-            <div class="text-center md:text-left">
-                <p class="text-gold-400 tracking-[0.2em] text-sm uppercase mb-4 reveal-text">Taste the Luxury</p>
-                <h1 class="text-5xl md:text-7xl font-serif font-bold leading-tight mb-6 reveal-text" style="transition-delay: 0.1s;">
-                    The Golden<br>Standard of <span class="text-gold-gradient italic">Burgers.</span>
-                </h1>
-                <p class="text-gray-400 text-lg mb-8 max-w-md mx-auto md:mx-0 reveal-text" style="transition-delay: 0.2s;">
-                    Handcrafted perfection using the finest beef, artisanal buns, and pure culinary passion.
-                </p>
-                <div class="reveal-text flex flex-col sm:flex-row gap-4 justify-center md:justify-start" style="transition-delay: 0.3s;">
-                    <a href="#menu-burgers" class="bg-gold-gradient text-dark font-bold px-8 py-4 rounded-none uppercase tracking-widest text-sm flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(212,175,55,0.2)] hover:scale-105 transition-transform">
-                        Explore Menu
-                    </a>
-                </div>
-            </div>
-            <div class="relative hidden md:block">
-                <div class="relative w-full aspect-square flex items-center justify-center">
-                    <div class="absolute inset-0 bg-gold-500 rounded-full opacity-10 filter blur-[60px] animate-pulse"></div>
-                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1500&auto=format&fit=crop" 
-                         alt="Premium Burger" 
-                         fetchpriority="high"
-                         class="w-[85%] h-[85%] object-cover rounded-full shadow-[0_0_50px_rgba(212,175,55,0.15)] floating-element border-4 border-surfaceLight">
-                </div>
-            </div>
+        <!-- Carousel Navigation Dots -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+            <div class="h-1 w-8 bg-gold-400 cursor-pointer transition-all duration-300 rounded-full" onclick="setHeroSlide(0)"></div>
+            <div class="h-1 w-8 bg-white/30 cursor-pointer transition-all duration-300 rounded-full" onclick="setHeroSlide(1)"></div>
+            <div class="h-1 w-8 bg-white/30 cursor-pointer transition-all duration-300 rounded-full" onclick="setHeroSlide(2)"></div>
         </div>
     </section>
 
-    <!-- Best Sellers Section -->
-    <section id="best-sellers" class="py-24 bg-surface relative border-t border-white/5">
+    <!-- Bunetto Signature Section (Replaces Best Sellers) -->
+    <section id="bunetto-signature" class="py-10 bg-gray-50 relative border-t border-gray-200">
         <div class="max-w-4xl mx-auto px-6 lg:px-8">
-            <div class="text-center mb-16 reveal-text">
-                <p class="text-gold-400 tracking-[0.2em] text-sm uppercase mb-2">Crowd Favorites</p>
-                <h2 class="text-4xl md:text-5xl font-serif font-bold">Best <span class="text-gold-gradient italic">Sellers</span></h2>
-                <div class="w-16 h-1 bg-gold-gradient mx-auto mt-6"></div>
+            <div class="text-center mb-8 reveal-text">
+                <p class="text-gold-500 tracking-[0.2em] text-sm uppercase mb-1 font-semibold">Top Picks</p>
+                <h2 class="text-3xl md:text-5xl font-serif font-bold text-gray-900">BUNETTO <span class="text-gold-gradient italic">SIGNATURE</span></h2>
+                <div class="w-16 h-1 bg-gold-gradient mx-auto mt-4"></div>
             </div>
             
-            <div class="relative rounded-3xl p-1 overflow-hidden group shadow-[0_0_50px_rgba(212,175,55,0.1)] bg-dark">
-                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,175,55,0.2),_rgba(5,5,5,1)_65%)] z-0 transition-opacity duration-700"></div>
-                <div class="relative z-10 bg-surface/40 backdrop-blur-xl rounded-[22px] p-4 md:p-8 border border-white/10 flex flex-col">
-                    <div id="list-bestsellers" class="flex flex-col"></div>
-                </div>
+            <div class="bg-white border border-gray-200 rounded-xl p-2 md:p-6 shadow-lg reveal-text">
+                <div id="list-signature" class="grid grid-cols-3 gap-2 md:gap-5 w-full"></div>
             </div>
         </div>
     </section>
 
-    <!-- Menu Categories -->
-    <div class="bg-dark relative py-10">
-        
-        <!-- Section: Burgers -->
-        <section id="menu-burgers" class="py-16 relative">
-            <div class="max-w-7xl mx-auto px-4 lg:px-8">
-                <div class="flex justify-between items-end mb-10 border-b border-white/5 pb-4 reveal-text">
-                    <div>
-                        <p class="text-gold-400 tracking-[0.2em] text-xs uppercase mb-1">Signature & Smash</p>
-                        <h2 class="text-3xl md:text-4xl font-serif font-bold text-white">Premium <span class="text-gold-gradient italic">Burgers</span></h2>
-                    </div>
-                    <button onclick="openViewAll('burgers')" class="text-gold-400 uppercase text-xs tracking-widest font-semibold hover:text-white transition-colors flex items-center gap-1 group">
-                        View All
-                        <svg width="16" height="16" viewBox="0 0 256 256" class="transform group-hover:translate-x-1 transition-transform"><path fill="currentColor" d="M221.66 133.66l-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32Z"/></svg>
-                    </button>
-                </div>
-
-                <div class="relative w-[100vw] -ml-[50vw] left-1/2 py-4">
-                    <!-- Solid Gold Left Arrow -->
-                    <button onclick="scrollCarousel('burgers', -1)" class="absolute left-2 md:left-[5vw] lg:left-[10vw] top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold-gradient text-dark flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] active:scale-90 transition-transform">
-                        <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg>
-                    </button>
-
-                    <div id="track-burgers" class="carousel-track"></div>
-
-                    <!-- Solid Gold Right Arrow -->
-                    <button onclick="scrollCarousel('burgers', 1)" class="absolute right-2 md:right-[5vw] lg:right-[10vw] top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold-gradient text-dark flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] active:scale-90 transition-transform">
-                        <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128L90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg>
-                    </button>
-                </div>
+    <!-- Horizontal Category Navigation -->
+    <div id="category-nav-wrapper" class="bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-[60px] md:top-[68px] z-30 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <div id="category-nav" class="flex overflow-x-auto gap-2 md:gap-3 py-3 no-scrollbar scroll-smooth">
+                <!-- Injected via JS -->
             </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- Section: Sides & Pasta -->
-        <section id="menu-sides" class="py-16 relative border-t border-white/5">
-            <div class="max-w-7xl mx-auto px-4 lg:px-8">
-                <div class="flex justify-between items-end mb-10 border-b border-white/5 pb-4 reveal-text">
-                    <div>
-                        <p class="text-gold-400 tracking-[0.2em] text-xs uppercase mb-1">Craving More</p>
-                        <h2 class="text-3xl md:text-4xl font-serif font-bold text-white">Sides & <span class="text-gold-gradient italic">Pasta</span></h2>
-                    </div>
-                    <button onclick="openViewAll('sides')" class="text-gold-400 uppercase text-xs tracking-widest font-semibold hover:text-white transition-colors flex items-center gap-1 group">
-                        View All
-                        <svg width="16" height="16" viewBox="0 0 256 256" class="transform group-hover:translate-x-1 transition-transform"><path fill="currentColor" d="M221.66 133.66l-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32Z"/></svg>
-                    </button>
-                </div>
-
-                <div class="relative w-[100vw] -ml-[50vw] left-1/2 py-4">
-                    <button onclick="scrollCarousel('sides', -1)" class="absolute left-2 md:left-[5vw] lg:left-[10vw] top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold-gradient text-dark flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] active:scale-90 transition-transform">
-                        <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg>
-                    </button>
-
-                    <div id="track-sides" class="carousel-track"></div>
-
-                    <button onclick="scrollCarousel('sides', 1)" class="absolute right-2 md:right-[5vw] lg:right-[10vw] top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold-gradient text-dark flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] active:scale-90 transition-transform">
-                        <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128L90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Beverages -->
-        <section id="menu-beverages" class="py-24 bg-surface relative border-t border-white/5">
-            <div class="max-w-4xl mx-auto px-6 lg:px-8">
-                <div class="text-center mb-16 reveal-text">
-                    <p class="text-gold-400 tracking-[0.2em] text-sm uppercase mb-2">Refreshments</p>
-                    <h2 class="text-4xl md:text-5xl font-serif font-bold">Cold <span class="text-gold-gradient italic">Beverages</span></h2>
-                    <div class="w-16 h-1 bg-gold-gradient mx-auto mt-6"></div>
-                </div>
-                <div class="bg-dark border border-white/10 rounded-xl p-4 md:p-8 shadow-2xl">
-                    <div id="list-beverages" class="flex flex-col"></div>
-                </div>
-            </div>
-        </section>
+    <!-- DYNAMIC MENU CONTAINER -->
+    <div id="menu-container" class="bg-white relative overflow-hidden pb-6">
+        <!-- JS dynamically injects categories here -->
     </div>
 
     <!-- Footer -->
-    <footer class="bg-surfaceLight pt-20 pb-10 border-t border-white/5">
+    <footer class="bg-gray-50 pt-16 pb-8 border-t border-gray-200">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="grid md:grid-cols-3 gap-12 mb-16 text-center md:text-left">
+            <div class="grid md:grid-cols-3 gap-10 mb-12 text-center md:text-left">
                 <div>
-                    <h4 class="text-3xl font-serif font-bold text-gold-gradient mb-4">BUNETTO.</h4>
-                    <p class="text-gray-400 text-sm mb-6 max-w-xs mx-auto md:mx-0 leading-relaxed">Redefining fast food. Elevating the burger experience through uncompromising quality and luxury ingredients.</p>
+                    <h4 class="text-3xl font-serif font-bold text-gold-gradient mb-3">BUNETTO.</h4>
+                    <p class="text-gray-600 text-sm mb-4 max-w-xs mx-auto md:mx-0 leading-relaxed">Redefining fast food. Elevating the burger experience through uncompromising quality and luxury ingredients.</p>
                 </div>
                 <div>
-                    <h4 class="font-serif text-xl mb-6 text-white">Visit Us</h4>
-                    <p class="text-gray-400 text-sm mb-2">Food District</p>
-                    <p class="text-gray-400 text-sm mb-6">Pakistan</p>
-                    <p class="text-gold-400 text-sm font-semibold">Open Daily: 12 PM - 12 AM</p>
+                    <h4 class="font-serif text-lg mb-4 text-gray-900 font-bold">Visit Us</h4>
+                    <p class="text-gray-600 text-sm mb-1">Food District</p>
+                    <p class="text-gray-600 text-sm mb-4">Pakistan</p>
+                    <p class="text-gold-600 text-sm font-bold">Open Daily: 12 PM - 12 AM</p>
                 </div>
                 <div>
-                    <h4 class="font-serif text-xl mb-6 text-white">Contact</h4>
-                    <p class="text-gray-400 text-sm mb-2">Order Now via WhatsApp</p>
-                    <a href="https://wa.me/923012343423" target="_blank" class="text-gold-400 text-2xl font-serif hover:text-white transition-colors block mb-4">+92 301 2343423</a>
+                    <h4 class="font-serif text-lg mb-4 text-gray-900 font-bold">Contact</h4>
+                    <p class="text-gray-600 text-sm mb-2">Order Now via WhatsApp</p>
+                    <a href="https://wa.me/923012343423" target="_blank" class="text-gold-500 text-xl font-serif hover:text-gold-600 transition-colors block mb-4 font-bold">+92 301 2343423</a>
                 </div>
             </div>
-            <div class="border-t border-white/10 pt-8 text-center">
+            <div class="border-t border-gray-200 pt-6 text-center">
                 <p class="text-gray-500 text-xs tracking-wider">&copy; 2026 Bunetto Premium Burgers. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
+    <!-- PRODUCT DETAILS MODAL -->
+    <div id="product-modal" class="backdrop fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeProductModal()"></div>
+        <div class="modal-popup bg-white rounded-2xl w-full max-w-md overflow-hidden z-10 shadow-2xl relative flex flex-col max-h-[90vh]">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center z-20 hover:bg-black/70 transition">
+                <svg width="14" height="14" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
+            </button>
+            
+            <div class="h-48 md:h-56 shrink-0 relative bg-gray-100">
+                <img id="pm-img" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            </div>
+            
+            <div class="p-5 flex-1 overflow-y-auto no-scrollbar">
+                <h3 id="pm-title" class="text-2xl font-serif font-bold text-gray-900 mb-1">Product Title</h3>
+                <p id="pm-desc" class="text-sm text-gray-500 mb-3 leading-relaxed"></p>
+                <div class="font-bold text-gold-600 text-lg mb-6">Rs. <span id="pm-price">0</span></div>
+
+                <!-- Extras Section -->
+                <div id="pm-extras-container" class="space-y-3 mb-2 hidden">
+                    <h4 class="font-bold text-xs text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">Add Extras</h4>
+                    
+                    <div id="pm-extra-cheese" class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <div>
+                            <p class="text-gray-900 text-sm font-bold">Cheese Slice</p>
+                            <p class="text-gold-500 text-xs font-bold">+Rs. 70</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="updateModalExtra('cheese', -1)" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all"><svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg></button>
+                            <span id="pm-qty-cheese" class="w-4 text-center font-bold text-sm select-none text-gray-900">0</span>
+                            <button onclick="updateModalExtra('cheese', 1)" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all"><svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg></button>
+                        </div>
+                    </div>
+                    
+                    <div id="pm-extra-sauce" class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <div>
+                            <p class="text-gray-900 text-sm font-bold">Extra Sauce</p>
+                            <p class="text-gold-500 text-xs font-bold">+Rs. 100</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="updateModalExtra('sauce', -1)" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all"><svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg></button>
+                            <span id="pm-qty-sauce" class="w-4 text-center font-bold text-sm select-none text-gray-900">0</span>
+                            <button onclick="updateModalExtra('sauce', 1)" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all"><svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Quantity Selector -->
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 mt-6 shadow-inner">
+                    <span class="text-gray-900 font-serif font-bold text-lg">Quantity</span>
+                    <div class="flex items-center gap-4">
+                        <button onclick="updateModalProductQty(-1)" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all font-bold text-xl">-</button>
+                        <span id="pm-qty" class="w-6 text-center font-bold text-xl select-none text-gray-900">1</span>
+                        <button onclick="updateModalProductQty(1)" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 shadow-sm active:scale-90 transition-all font-bold text-xl">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-gray-100 bg-white">
+                <button onclick="confirmModalAdd(event)" class="w-full bg-gold-gradient text-white font-bold py-4 rounded-md uppercase tracking-wider text-sm shadow-[0_4px_15px_rgba(212,175,55,0.3)] active:scale-95 transition-all flex justify-between px-6 items-center">
+                    <span>Add to Order</span>
+                    <span id="pm-total">Rs. 0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Cart Drawer Overlays & UI -->
-    <div id="cart-backdrop" class="backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50" onclick="toggleCart()"></div>
+    <div id="cart-backdrop" class="backdrop fixed inset-0 bg-black/60 backdrop-blur-sm z-[80]" onclick="toggleCart()"></div>
     
-    <div id="cart-drawer" class="fixed top-0 right-0 w-full md:w-[450px] h-full bg-surfaceLight border-l border-white/10 z-50 flex flex-col shadow-2xl">
-        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-dark">
-            <h2 class="text-2xl font-serif text-gold-gradient">Your Order</h2>
-            <button onclick="toggleCart()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+    <div id="cart-drawer" class="side-drawer fixed top-0 right-0 w-full md:w-[450px] h-full bg-white border-l border-gray-200 z-[90] flex flex-col shadow-2xl">
+        <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-white">
+            <h2 class="text-2xl font-serif text-gold-gradient font-bold">Your Order</h2>
+            <button onclick="toggleCart()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors">
                 <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
             </button>
         </div>
 
-        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50"></div>
 
-        <div class="p-6 border-t border-white/10 bg-dark shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div class="p-5 border-t border-gray-200 bg-white shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
             <div class="mb-4">
-                <label class="text-gray-400 text-xs uppercase tracking-widest mb-2 block">Order Type</label>
+                <label class="text-gray-600 text-xs uppercase tracking-widest mb-2 block font-bold">Order Type</label>
                 <div class="relative">
-                    <select id="order-type" onchange="updateCartUI()" class="w-full bg-surfaceLight border border-white/10 text-white rounded-md p-3 pr-10 text-sm outline-none focus:border-gold-400 transition-colors cursor-pointer appearance-none">
+                    <select id="order-type" onchange="updateCartUI()" class="w-full bg-white border border-gray-300 text-gray-900 rounded-md p-3 pr-10 text-sm outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400 transition-all cursor-pointer appearance-none font-medium">
                         <option value="pickup">Pickup (Free)</option>
                         <option value="delivery">Delivery (+Rs. 150)</option>
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-400">
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
                         <svg width="16" height="16" viewBox="0 0 256 256"><path fill="currentColor" d="M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80A8 8 0 0 1 53.66 90.34L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg>
                     </div>
                 </div>
             </div>
 
             <div id="delivery-fee-row" class="flex justify-between items-center mb-2 hidden">
-                <span class="text-gray-400 text-sm">Delivery Fee</span>
-                <span class="text-white text-sm font-bold">Rs. 150</span>
+                <span class="text-gray-600 text-sm font-medium">Delivery Fee</span>
+                <span class="text-gray-900 text-sm font-bold">Rs. 150</span>
             </div>
 
-            <div class="flex justify-between items-center mb-6">
-                <span class="text-gray-400 uppercase text-xs tracking-widest">Total Amount</span>
-                <span id="cart-total" class="text-3xl font-serif text-white font-bold">Rs. 0</span>
+            <div class="flex justify-between items-center mb-5 border-t border-gray-100 pt-4">
+                <span class="text-gray-600 uppercase text-xs tracking-widest font-bold">Total Amount</span>
+                <span id="cart-total" class="text-3xl font-serif text-gray-900 font-bold">Rs. 0</span>
             </div>
             
-            <button onclick="checkoutWhatsApp()" class="w-full bg-gold-gradient text-dark font-bold py-4 rounded-md uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)] active:scale-95 transition-all">
+            <button onclick="checkoutWhatsApp()" class="w-full bg-gold-gradient text-white font-bold py-4 rounded-md uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(212,175,55,0.3)] active:scale-95 transition-all">
                 <svg width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="M187.58 144.84l-32-16a8 8 0 0 0-8 1.5l-19.29 19.3a89.73 89.73 0 0 1-39.45-39.45l19.3-19.29a8 8 0 0 0 1.5-8l-16-32A8 8 0 0 0 86.46 44c-13.61 2-22.46 14.41-22.46 28c0 82.72 67.28 150 150 150c13.59 0 26-8.85 28-22.46a8 8 0 0 0-6.87-8.7A239.38 239.38 0 0 1 128 64a240.54 240.54 0 0 1 85.08 15.63a8 8 0 0 0 10.38-4.46a8 8 0 0 0-4.46-10.38A256.49 256.49 0 0 0 128 48a255.45 255.45 0 0 0-80.4 13C33 65.57 24 81 24 99.88c0 97 79 176 176 176c18.88 0 34.31-9 38.86-23.64A23.94 23.94 0 0 0 215 220l-16-32Z"/></svg>
                 Order via WhatsApp
             </button>
@@ -458,123 +502,252 @@
     </div>
 
     <!-- View All Full Screen Modal -->
-    <div id="view-all-modal" class="fixed inset-0 z-[60] bg-dark flex flex-col h-[100dvh]">
-        <div class="p-6 border-b border-white/10 bg-surfaceLight/95 backdrop-blur-md flex justify-between items-center sticky top-0 z-10 shadow-xl">
+    <div id="view-all-modal" class="fixed inset-0 z-[60] bg-white flex flex-col h-[100dvh]">
+        <div class="p-5 border-b border-gray-200 bg-white/95 backdrop-blur-md flex justify-between items-center sticky top-0 z-10 shadow-sm">
             <div>
-                <p class="text-gold-400 tracking-[0.2em] text-[10px] uppercase mb-1">Complete Collection</p>
-                <h2 id="modal-title" class="text-2xl md:text-3xl font-serif font-bold text-white capitalize">All Items</h2>
+                <p class="text-gold-500 tracking-[0.2em] text-[10px] font-bold uppercase mb-1">Complete Collection</p>
+                <h2 id="modal-title" class="text-xl md:text-2xl font-serif font-bold text-gray-900 capitalize">All Items</h2>
             </div>
-            <button onclick="closeViewAll()" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors">
-                <svg width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
+            <button onclick="closeViewAll()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors">
+                <svg width="18" height="18" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
-            <div id="modal-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto"></div>
+        <div class="flex-1 overflow-y-auto p-5 md:p-8 bg-gray-50 custom-scrollbar">
+            <!-- Grid layout for modal viewing -->
+            <div id="modal-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-7xl mx-auto"></div>
         </div>
     </div>
 
     <script>
-        // --- COUNTDOWN TIMER & CURTAIN LOGIC ---
+        // --- TIMER & CURTAIN ---
         function initTimerAndCurtains() {
-            // Set opening date to 5 days from now
-            const openingDate = new Date();
-            openingDate.setDate(openingDate.getDate() + 5);
-            openingDate.setHours(18, 0, 0, 0); // 6:00 PM
+            const openingDate = new Date('2026-04-10T12:00:00+05:00');
 
-            const daysEl = document.getElementById('timer-days');
-            const hoursEl = document.getElementById('timer-hours');
-            const minsEl = document.getElementById('timer-mins');
-            const secsEl = document.getElementById('timer-secs');
+            const dEl = document.getElementById('timer-days'), hEl = document.getElementById('timer-hours'),
+                  mEl = document.getElementById('timer-mins'), sEl = document.getElementById('timer-secs');
 
             const timerInterval = setInterval(() => {
-                const now = new Date().getTime();
-                const distance = openingDate.getTime() - now;
-
-                if (distance < 0) {
-                    clearInterval(timerInterval);
-                    openCurtains();
-                    return;
-                }
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                daysEl.textContent = String(days).padStart(2, '0');
-                hoursEl.textContent = String(hours).padStart(2, '0');
-                minsEl.textContent = String(minutes).padStart(2, '0');
-                secsEl.textContent = String(seconds).padStart(2, '0');
+                const distance = openingDate.getTime() - new Date().getTime();
+                if (distance < 0) { clearInterval(timerInterval); openCurtains(); return; }
+                dEl.textContent = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
+                hEl.textContent = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                mEl.textContent = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                sEl.textContent = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
             }, 1000);
         }
 
         function openCurtains() {
-            const content = document.getElementById('curtain-content');
-            const left = document.getElementById('curtain-left');
-            const right = document.getElementById('curtain-right');
-            const curtainWrapper = document.getElementById('opening-curtain');
-
-            // 1. Fade out the text & timer
-            content.classList.add('hide');
-
-            // 2. Slide curtains apart after text fades
+            document.getElementById('curtain-content').classList.add('hide');
             setTimeout(() => {
-                left.classList.add('open');
-                right.classList.add('open');
-                document.body.classList.remove('locked'); // Allow scrolling
+                document.getElementById('curtain-left').classList.add('open');
+                document.getElementById('curtain-right').classList.add('open');
+                document.body.classList.remove('locked');
             }, 400);
+            setTimeout(() => document.getElementById('opening-curtain').style.display = 'none', 1900);
+        }
 
-            // 3. Remove wrapper from DOM after animation completes
-            setTimeout(() => {
-                curtainWrapper.style.display = 'none';
-            }, 1900);
+        // --- HERO CAROUSEL ---
+        let currentHeroSlide = 0;
+        let heroInterval;
+
+        function setHeroSlide(index) {
+            const slides = document.querySelectorAll('.hero-carousel-item');
+            const dots = document.querySelectorAll('#hero-carousel .rounded-full');
+            
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => {
+                d.classList.remove('bg-gold-400', 'w-8');
+                d.classList.add('bg-white/30', 'w-4');
+            });
+
+            currentHeroSlide = index;
+            slides[currentHeroSlide].classList.add('active');
+            dots[currentHeroSlide].classList.add('bg-gold-400', 'w-8');
+            dots[currentHeroSlide].classList.remove('bg-white/30', 'w-4');
+
+            // Reset Interval
+            clearInterval(heroInterval);
+            startHeroAutoRotate();
+        }
+
+        function startHeroAutoRotate() {
+            heroInterval = setInterval(() => {
+                let next = (currentHeroSlide + 1) % 3;
+                setHeroSlide(next);
+            }, 5000);
         }
 
         // --- MENU DATA ---
+        // Extras removed per user instructions
         const menuData = {
-            burgers: [
-                { id: "b1", name: "Classic beef burger", price: 500, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" },
-                { id: "b2", name: "Beef cheese supreme", price: 600, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" },
-                { id: "b3", name: "Bunetto signature stuffed", price: 650, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
-                { id: "b4", name: "Beef smash bites", price: 650, img: "data:image/jpeg;base64,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" },
-                { id: "b5", name: "Shroom smash", price: 700, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
-                { id: "b6", name: "Onion bliss smash", price: 750, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" },
-                { id: "b7", name: "Bunetto megaton", price: 900, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
-                { id: "b8", name: "Bunetto crunchy core", price: 450, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
-                { id: "b9", name: "Twin patty burger", price: 620, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" },
-                { id: "b10", name: "Chicken melt stuffed", price: 600, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
-                { id: "b11", name: "Crunch zing", price: 450, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
-                { id: "b12", name: "Smoky zing", price: 500, img:"images/smoky zing.png"},
-                { id: "b13", name: "Double trouble burger", price: 1000, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
-                { id: "b14", name: "Bunetto mighty zing", price: 700, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
-                { id: "b15", name: "Fire cluck sandwich", price: 500, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
-                { id: "b16", name: "Crispy cluck", price: 550, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK2O_3DfVzV1ZyllnOpGjWaecciDqMd3mEdw&s" },
-                { id: "b17", name: "Cheese cluck", price: 650, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" }
+            beef: [
+                { id: "beef1", name: "Classic Beef Burger", desc: "Juicy grilled beef patty, fresh lettuce, tomatoes, onions, creamy mayo & signature house sauce", price: 499, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" },
+                { id: "beef2", name: "Beef Cheese Supreme", desc: "Beef layer, cheese, caramelized onions & rich creamy sauce", price: 600, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" },
+                { id: "beef3", name: "Bunetto Megaton", desc: "Double patties, double cheese, crispy onions & fully loaded signature sauces", price: 900, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" }
             ],
-            sides: [
-                { id: "s1", name: "Fire fries", price: 200, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRyDm6uSiCaVGL_mVPHvDglhQs8dQajPc0Bg&s" },
-                { id: "s2", name: "Garlic boss", price: 300, img: "data:image/jpeg;base64,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" },
-                { id: "s3", name: "Zesty chicken fries", price: 600, img: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=600&auto=format&fit=crop" },
-                { id: "s4", name: "Bunetto special sause", price: 500, img: "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?q=80&w=600&auto=format&fit=crop" },
-                { id: "s5", name: "Crispy wings", price: 480, img: "https://images.unsplash.com/photo-1524114664604-cd8133cd67ad?q=80&w=600&auto=format&fit=crop" },
-                { id: "s6", name: "Buffalo wings", price: 550, img: "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?q=80&w=600&auto=format&fit=crop" },
-                { id: "s7", name: "Dynamic chicken", price: 450, img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=600&auto=format&fit=crop" },
-                { id: "s8", name: "Alfredo sauce pasta", price: 700, img: "https://images.unsplash.com/photo-1612874742237-6526221588e3?q=80&w=600&auto=format&fit=crop" },
-                { id: "s9", name: "Bunetto street chowmein", price: 650, img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=600&auto=format&fit=crop" }
+            stuffed: [
+                { id: "stf1", name: "Bunetto Signature Stuffed", desc: "Stuffed beef patty, molten cheese, jalapeños & signature sauces", price: 650, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
+                { id: "stf2", name: "Chicken Melt Stuffed", desc: "Crispy chicken stuffed with melted cheese, lettuce & creamy mayo", price: 600, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" }
+            ],
+            smash: [
+                { id: "sm1", name: "Beef Smash Bites", desc: "Smashed beef patty with cheese, pickles & smash sauce", price: 650, img: "images/smash_bites.png" },
+                { id: "sm2", name: "Shroom Smash", desc: "Beef smash topped with sautéed mushrooms, cheese & creamy garlic sauce", price: 700, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" },
+                { id: "sm3", name: "Onion Bliss Smash", desc: "Beef patty, caramelized onions, cheese & smoky rich flavor", price: 750, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" }
+            ],
+            chicken: [
+                { id: "chk1", name: "Bunetto Crunchy Core", desc: "Golden fried chicken with lettuce & creamy mayo", price: 450, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
+                { id: "chk2", name: "Twin Patty Burger", desc: "Two crispy chicken patties, cheese, fresh veggies & creamy sauce", price: 620, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" }
+            ],
+            grill: [
+                { id: "gr1", name: "Grill X", desc: "Flame-grilled beef patty, crisp lettuce, cheese, fresh tomatoes, pickles, creamy mayo & signature grill sauce", price: 600, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" },
+                { id: "gr2", name: "Shroom X", desc: "Flame-grilled beef patties, mushrooms, melted cheese, fresh lettuce, creamy mushroom sauce & garlic mayo", price: 720, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
+                { id: "gr3", name: "Charcoal Beast", desc: "Double flame-grilled beef patties, cheese, caramelized onions, crisp lettuce, smoky BBQ & signature beast sauce", price: 950, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" }
+            ],
+            zinger: [
+                { id: "zg1", name: "Crunch Zing", desc: "Crispy fillet with lettuce & mayo", price: 450, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
+                { id: "zg2", name: "Smoky Zing", desc: "Zinger with BBQ sauce & creamy mayo", price: 500, img: "images/smoky_zing.png" },
+                { id: "zg3", name: "Bunetto Mighty Zing", desc: "Cheese, jalapeños & signature sauces with extra crunch", price: 700, img: "https://images.unsplash.com/photo-1615719413546-198b25453f85?q=80&w=600&auto=format&fit=crop" },
+                { id: "zg4", name: "Double Trouble", desc: "One juicy beef patty & one crispy zinger fillet, double cheese, fresh veggies & signature sauces", price: 1000, img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=600&auto=format&fit=crop" }
+            ],
+            sandwiches: [
+                { id: "sd1", name: "Fire Cluck", desc: "Spicy grilled chicken with fiery sauce & lettuce", price: 500, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?q=80&w=600&auto=format&fit=crop" },
+                { id: "sd2", name: "Crispy Cluck", desc: "Crispy chicken strips with mayo & fresh lettuce", price: 550, img: "images/crispy_cluck.png" },
+                { id: "sd3", name: "Cheese Cluck", desc: "Chicken fillet with melted cheese & creamy sauce", price: 650, img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=600&auto=format&fit=crop" }
+            ],
+            fries: [
+                { id: "fr1", name: "Fire Fries", desc: "Crispy fries tossed in spicy seasoning", price: 200, img: "images/fire_fries.png" },
+                { id: "fr2", name: "Garlic Boss Fries", desc: "Loaded with creamy garlic sauce & herbs", price: 300, img: "images/garlic_fries.png" },
+                { id: "fr3", name: "Zesty Chicken Fries", desc: "Crispy chicken strips with zesty dip & fries", price: 600, img: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=600&auto=format&fit=crop" },
+                { id: "fr4", name: "Bunetto Special Sauce Fries", desc: "Fries loaded with Bunetto special sauce", price: 500, img: "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?q=80&w=600&auto=format&fit=crop" }
+            ],
+            wings: [
+                { id: "wg1", name: "Crispy Wings", desc: "Perfectly fried wings with mild seasoning", price: 480, img: "https://images.unsplash.com/photo-1524114664604-cd8133cd67ad?q=80&w=600&auto=format&fit=crop" },
+                { id: "wg2", name: "Buffalo Wings", desc: "Juicy wings tossed in buffalo sauce", price: 550, img: "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?q=80&w=600&auto=format&fit=crop" },
+                { id: "wg3", name: "Dynamic Chicken", desc: "Crispy chicken pieces with signature spices", price: 450, img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=600&auto=format&fit=crop" }
             ],
             beverages: [
-                { id: "d1", name: "Water (500ml)", price: 100, img: "https://www.pngarts.com/files/4/Water-Bottle-Transparent-Background-PNG.png" },
-                { id: "d2", name: "Dew (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" },
-                { id: "d3", name: "Pepsi (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" },
-                { id: "d4", name: "7up (345ml)", price: 100, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" }
+                { id: "d1", name: "Water (500ml)", desc: "", price: 100, img: "images/water.png" },
+                { id: "d2", name: "Dew (345ml)", desc: "", price: 110, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" },
+                { id: "d3", name: "Pepsi (345ml)", desc: "", price: 110, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" },
+                { id: "d4", name: "7up (345ml)", desc: "", price: 110, img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=600&auto=format&fit=crop" }
             ]
         };
 
-        const bestSellersIds = ["b3", "b7", "s1", "s8"];
-        const allProducts = [...menuData.burgers, ...menuData.sides, ...menuData.beverages];
+        // Hidden extra items to be easily added to the cart
+        menuData.extras = [
+            { id: "ex_sauce", name: "Extra Sauce", desc: "", price: 100, img: "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?q=80&w=600&auto=format&fit=crop" },
+            { id: "ex_cheese", name: "Cheese Slice", desc: "", price: 70, img: "https://images.unsplash.com/photo-1623653387945-2fd2540d9c49?q=80&w=600&auto=format&fit=crop" }
+        ];
+
+        const signatureIds = ["beef3", "gr3", "zg4", "zg3", "fr4", "sd3"];
+        const allProducts = Object.values(menuData).flat();
         
         let cart = [];
         const WHATSAPP_NUMBER = "923012343423"; 
+
+        // --- DYNAMIC LAYOUT CONFIG ---
+        const categoryConfig = [
+            { id: "beef", subtitle: "Classics & Supremes", title: "Beef Burgers", group: 'burger' },
+            { id: "stuffed", subtitle: "Oozing Goodness", title: "Stuffed Burgers", group: 'burger' },
+            { id: "smash", subtitle: "Crispy Edges", title: "Beef Smash Burgers", group: 'burger' },
+            { id: "chicken", subtitle: "Crispy & Tender", title: "Chicken Burgers", group: 'burger' },
+            { id: "grill", subtitle: "Flame Grilled", title: "Grill Burgers", group: 'burger' },
+            { id: "zinger", subtitle: "Ultimate Crunch", title: "Zinger Burgers", group: 'burger' },
+            { id: "sandwiches", subtitle: "Cluckin Good", title: "Chicken Sandwiches", group: 'burger' },
+            { id: "fries", subtitle: "Perfect Additions", title: "Fries & Sides", group: 'fries' },
+            { id: "wings", subtitle: "Finger Lickin", title: "Wings & Chicken", group: 'wings' },
+            { id: "beverages", subtitle: "Refreshments", title: "Cold Beverages", group: 'beverages' }
+        ];
+
+        categoryConfig.forEach(cat => {
+            const count = menuData[cat.id].length;
+            if (cat.id === 'beverages') cat.type = 'list';
+            else if (cat.id === 'zinger' || cat.id === 'fries') cat.type = 'carousel';
+            else if (count > 4) cat.type = 'carousel';
+            else if (count === 4) cat.type = 'grid';
+            else cat.type = 'list';
+        });
+
+        // --- DYNAMIC RENDERING ---
+        function renderCategoryNav() {
+            const navContainer = document.getElementById('category-nav');
+            let html = '';
+            categoryConfig.forEach(cat => {
+                html += `<a href="#menu-${cat.id}" class="snap-start shrink-0 px-4 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-[13px] md:text-sm font-semibold text-gray-700 hover:bg-gold-500 hover:text-white hover:border-gold-500 transition-colors whitespace-nowrap">${cat.title}</a>`;
+            });
+            navContainer.innerHTML = html;
+        }
+
+        function renderAllCategories() {
+            const container = document.getElementById('menu-container');
+            let html = '';
+
+            categoryConfig.forEach((cat, index) => {
+                const borderClass = index > 0 ? 'border-t border-gray-200' : '';
+                
+                // Tighter Spacing applied here: py-8 instead of py-16, mb-4 instead of mb-10
+                const headerHtml = `
+                    <div class="flex justify-between items-end mb-4 border-b border-gray-100 pb-3 reveal-text">
+                        <div>
+                            <p class="text-gold-500 tracking-[0.2em] text-[10px] font-bold uppercase mb-1">${cat.subtitle}</p>
+                            <h2 class="text-2xl md:text-4xl font-serif font-bold text-gray-900">${cat.title}</h2>
+                        </div>
+                        <button onclick="openViewAll('${cat.id}')" class="text-gold-500 uppercase text-[10px] md:text-xs tracking-widest font-bold hover:text-gray-900 transition-colors flex items-center gap-1 group bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
+                            View All
+                            <svg width="14" height="14" viewBox="0 0 256 256" class="transform group-hover:translate-x-1 transition-transform"><path fill="currentColor" d="M221.66 133.66l-72 72a8 8 0 0 1-11.32-11.32L196.69 136H40a8 8 0 0 1 0-16h156.69l-58.35-58.34a8 8 0 0 1 11.32-11.32l72 72a8 8 0 0 1 0 11.32Z"/></svg>
+                        </button>
+                    </div>
+                `;
+
+                if (cat.type === 'carousel') {
+                    html += `
+                    <section id="menu-${cat.id}" class="py-8 relative ${borderClass}">
+                        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+                            ${headerHtml}
+                            <div class="relative w-[100vw] -ml-[50vw] left-1/2 py-2">
+                                <button onclick="scrollCarousel('${cat.id}', -1)" class="absolute left-1 sm:left-3 md:left-[5vw] lg:left-[10vw] top-1/2 -translate-y-1/2 z-[60] w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white text-gold-500 flex items-center justify-center shadow-md active:scale-90 transition-transform">
+                                    <svg width="20" height="20" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M165.66 202.34a8 8 0 0 1-11.32 11.32l-80-80a8 8 0 0 1 0-11.32l80-80a8 8 0 0 1 11.32 11.32L91.31 128Z"/></svg>
+                                </button>
+                                <div id="track-${cat.id}" class="carousel-track"></div>
+                                <button onclick="scrollCarousel('${cat.id}', 1)" class="absolute right-1 sm:right-3 md:right-[5vw] lg:right-[10vw] top-1/2 -translate-y-1/2 z-[60] w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-200 bg-white text-gold-500 flex items-center justify-center shadow-md active:scale-90 transition-transform">
+                                    <svg width="20" height="20" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128L90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </section>`;
+                } else if (cat.type === 'grid') {
+                    html += `
+                    <section id="menu-${cat.id}" class="py-8 relative ${borderClass}">
+                        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+                            ${headerHtml}
+                            <div id="grid-${cat.id}" class="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 snap-x snap-mandatory no-scrollbar"></div>
+                        </div>
+                    </section>`;
+                } else if (cat.type === 'list') {
+                    html += `
+                    <section id="menu-${cat.id}" class="py-8 relative bg-gray-50 ${borderClass}">
+                        <div class="max-w-4xl mx-auto px-6 lg:px-8">
+                            <div class="text-center mb-6 reveal-text">
+                                <p class="text-gold-500 tracking-[0.2em] text-[10px] font-bold uppercase mb-1">${cat.subtitle}</p>
+                                <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900">${cat.title}</h2>
+                                <div class="w-12 h-1 bg-gold-gradient mx-auto mt-3"></div>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded-xl p-4 md:p-6 shadow-md">
+                                <div id="list-${cat.id}" class="flex flex-col"></div>
+                            </div>
+                        </div>
+                    </section>`;
+                }
+            });
+
+            container.innerHTML = html;
+
+            categoryConfig.forEach(cat => {
+                if (cat.type === 'carousel') initNativeCarousel(cat.id);
+                else if (cat.type === 'grid') renderGrid(cat.id);
+                else if (cat.type === 'list') renderList(cat.id);
+            });
+        }
 
         // --- CART UI ENGINE ---
         function triggerPopBadge() {
@@ -591,38 +764,42 @@
         function spawnParticle(event, text) {
             if(!event) return;
             const el = document.createElement('div');
-            el.className = 'particle';
+            el.className = 'particle text-gold-500 font-bold text-xl fixed z-[9999] pointer-events-none drop-shadow-md';
             el.textContent = text;
             
-            const x = event.clientX || (event.touches && event.touches[0].clientX);
-            const y = event.clientY || (event.touches && event.touches[0].clientY);
+            // Accurately capture click or touch event position for floating particle
+            const x = event.clientX || (event.touches && event.touches[0].clientX) || window.innerWidth / 2;
+            const y = event.clientY || (event.touches && event.touches[0].clientY) || window.innerHeight / 2;
             
-            if(x && y) {
-                el.style.left = `${x - 10}px`;
-                el.style.top = `${y - 20}px`;
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 800); 
-            }
+            el.style.left = `${x - 10}px`;
+            el.style.top = `${y - 20}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800); 
         }
 
         function getCartButtonHTML(id) {
-            const item = cart.find(c => c.id === id);
-            if (item) {
+            const instances = cart.filter(c => c.id === id);
+            const totalQty = instances.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalQty > 0) {
+                // If in cart, show quantity selector
+                // We affect the first instance found for simple +/- actions on card
+                const targetInstanceId = instances[0].instanceId;
                 return `
-                    <div class="flex items-center bg-gold-gradient rounded-full h-10 px-1 shadow-lg text-dark z-20 transition-all">
-                        <button onclick="updateQuantity('${id}', -1, event)" class="w-8 h-8 flex items-center justify-center font-bold hover:bg-white/30 rounded-full transition-colors active:scale-90">
-                            <svg width="14" height="14" viewBox="0 0 256 256"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg>
+                    <div class="flex items-center bg-gold-gradient rounded-full h-10 px-1 shadow-md text-white z-20 transition-all border border-gold-500" onclick="event.stopPropagation()">
+                        <button onclick="updateQuantity('${targetInstanceId}', -1, event)" class="w-8 h-8 flex items-center justify-center font-bold hover:bg-black/10 rounded-full transition-colors active:scale-90">
+                            <svg width="14" height="14" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg>
                         </button>
-                        <span class="w-6 text-center font-bold text-sm select-none">${item.qty}</span>
-                        <button onclick="updateQuantity('${id}', 1, event)" class="w-8 h-8 flex items-center justify-center font-bold hover:bg-white/30 rounded-full transition-colors active:scale-90">
-                            <svg width="14" height="14" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
+                        <span class="w-7 text-center font-bold text-sm select-none">${totalQty}</span>
+                        <button onclick="updateQuantity('${targetInstanceId}', 1, event)" class="w-8 h-8 flex items-center justify-center font-bold hover:bg-black/10 rounded-full transition-colors active:scale-90">
+                            <svg width="14" height="14" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
                         </button>
                     </div>
                 `;
             } else {
                 return `
-                    <button onclick="addToCart('${id}', event)" class="w-10 h-10 rounded-full bg-surfaceLight border border-gold-400/50 text-gold-400 hover:bg-gold-gradient hover:text-dark hover:border-transparent flex items-center justify-center transition-all shadow-[0_0_15px_rgba(212,175,55,0.1)] z-20 active:scale-90">
-                        <svg width="18" height="18" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
+                    <button onclick="openProductModal('${id}', event)" class="w-full bg-gold-gradient text-white text-[10px] md:text-xs font-bold py-2 md:py-2.5 px-4 rounded-full uppercase tracking-wider transition-all shadow-sm z-20 active:scale-95 whitespace-nowrap">
+                        Add to Cart
                     </button>
                 `;
             }
@@ -634,20 +811,44 @@
             });
         }
 
-        // --- HTML RENDERING ---
-        function generateCardWrap(product) {
+        // --- HTML TEMPLATES ---
+        function generateGridItemHTML(product) {
+            const descHtml = product.desc ? `<p class="text-[9px] md:text-xs text-gray-500 line-clamp-1 md:line-clamp-2 mt-1 leading-tight">${product.desc}</p>` : '';
             return `
-                <div class="carousel-item-wrap w-[240px] md:w-[320px]">
-                    <div class="menu-card bg-surfaceLight border border-white/5 p-4 rounded-xl relative group flex flex-col h-[380px] md:h-[400px] shadow-2xl mx-auto w-full">
-                        <div class="h-40 md:h-48 overflow-hidden mb-4 relative rounded-lg shrink-0">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-0 transition-opacity z-10 pointer-events-none"></div>
+                <div class="menu-card bg-white border border-gray-100 p-2 md:p-4 rounded-lg md:rounded-xl relative group flex flex-col h-full shadow-sm hover:shadow-md transition-shadow cursor-pointer w-full overflow-hidden" onclick="openProductModal('${product.id}', event)">
+                    <div class="h-20 sm:h-32 md:h-40 overflow-hidden mb-2 relative rounded-md shrink-0">
+                        <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif text-[11px] sm:text-[14px] md:text-[17px] text-gray-900 group-hover:text-gold-600 font-bold transition-colors line-clamp-1 md:line-clamp-2 leading-tight">${product.name}</h3>
+                            ${descHtml}
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-2 pt-2 border-t border-gray-100 gap-1">
+                            <span class="text-gold-600 font-bold text-[10px] sm:text-xs md:text-base tracking-wide">Rs. ${product.price}</span>
+                            <div class="cart-btn-wrapper flex justify-end" data-id="${product.id}" onclick="event.stopPropagation()"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCardWrap(product) {
+            const descHtml = product.desc ? `<p class="text-xs text-gray-500 line-clamp-2 mt-1 leading-snug">${product.desc}</p>` : '';
+            return `
+                <div class="carousel-item-wrap w-[220px] md:w-[300px]">
+                    <div class="menu-card bg-white border border-gray-100 p-3 md:p-4 rounded-xl relative group flex flex-col h-[350px] md:h-[380px] shadow-md mx-auto w-full cursor-pointer" onclick="openProductModal('${product.id}', event)">
+                        <div class="h-32 md:h-40 overflow-hidden mb-3 relative rounded-lg shrink-0">
                             <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 flex flex-col justify-between pointer-events-auto">
-                            <h3 class="font-serif text-[17px] md:text-[18px] text-white group-hover:text-gold-400 transition-colors line-clamp-2 leading-snug mb-2">${product.name}</h3>
-                            <div class="flex justify-between items-center mt-auto pt-4 border-t border-white/5">
-                                <span class="text-gold-400 font-bold text-base md:text-lg tracking-wide">Rs. ${product.price}</span>
-                                <div class="cart-btn-wrapper flex justify-end" data-id="${product.id}"></div>
+                            <div>
+                                <h3 class="font-serif text-[16px] md:text-[18px] text-gray-900 group-hover:text-gold-600 font-bold transition-colors line-clamp-2 leading-snug">${product.name}</h3>
+                                ${descHtml}
+                            </div>
+                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                                <span class="text-gold-600 font-bold text-base tracking-wide">Rs. ${product.price}</span>
+                                <div class="cart-btn-wrapper flex justify-end" data-id="${product.id}" onclick="event.stopPropagation()"></div>
                             </div>
                         </div>
                     </div>
@@ -656,39 +857,24 @@
         }
 
         function generateListItemHTML(product, isLast) {
+            const descHtml = product.desc ? `<p class="text-[11px] md:text-xs text-gray-500 line-clamp-1 mt-0.5">${product.desc}</p>` : '';
             return `
-                <div class="flex items-center gap-4 py-4 ${!isLast ? 'border-b border-white/5' : ''} hover:bg-white/[0.03] transition-colors rounded-lg px-2 group">
-                    <div class="relative w-16 h-16 md:w-20 md:h-20 shrink-0">
+                <div class="flex items-center gap-3 md:gap-4 py-3 md:py-4 ${!isLast ? 'border-b border-gray-100' : ''} hover:bg-gray-50 transition-colors rounded-lg px-1 md:px-2 group cursor-pointer" onclick="openProductModal('${product.id}', event)">
+                    <div class="relative w-14 h-14 md:w-16 md:h-16 shrink-0">
                         <div class="absolute inset-0 bg-gold-500/20 rounded-md opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none"></div>
-                        <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover rounded-md border border-white/10">
+                        <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover rounded-md border border-gray-200 shadow-sm">
                     </div>
                     <div class="flex-1">
-                        <h4 class="text-white font-serif text-base md:text-lg transition-colors group-hover:text-gold-400">${product.name}</h4>
-                        <p class="text-gold-400 font-semibold text-sm md:text-base mt-1">Rs. ${product.price}</p>
+                        <h4 class="text-gray-900 font-serif text-sm md:text-base font-bold transition-colors group-hover:text-gold-600">${product.name}</h4>
+                        ${descHtml}
+                        <p class="text-gold-600 font-bold text-xs md:text-sm mt-0.5">Rs. ${product.price}</p>
                     </div>
-                    <div class="cart-btn-wrapper flex justify-end items-center shrink-0" data-id="${product.id}"></div>
+                    <div class="cart-btn-wrapper flex justify-end items-center shrink-0" data-id="${product.id}" onclick="event.stopPropagation()"></div>
                 </div>
             `;
         }
 
-        function generateModalCardHTML(product) {
-            return `
-                <div class="menu-card bg-surfaceLight border border-white/5 p-4 rounded-xl relative group flex flex-col h-[350px] shadow-lg">
-                    <div class="h-40 overflow-hidden mb-4 relative rounded-lg shrink-0">
-                        <img src="${product.img}" alt="${product.name}" loading="lazy" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1 flex flex-col justify-between">
-                        <h3 class="font-serif text-[16px] text-white group-hover:text-gold-400 transition-colors line-clamp-2 mb-2">${product.name}</h3>
-                        <div class="flex justify-between items-center mt-auto pt-3 border-t border-white/5">
-                            <span class="text-gold-400 font-bold">Rs. ${product.price}</span>
-                            <div class="cart-btn-wrapper flex justify-end" data-id="${product.id}"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- CAROUSEL ENGINE ---
+        // --- ENGINES ---
         function initNativeCarousel(categoryId) {
             const track = document.getElementById(`track-${categoryId}`);
             const items = menuData[categoryId];
@@ -721,7 +907,6 @@
                 const singleItemWidth = track.children[1].offsetLeft - track.children[0].offsetLeft;
                 const setWidth = items.length * singleItemWidth;
                 
-                // Safegaurd: Prevent infinite loop if layout hasn't rendered yet (width is 0)
                 if (setWidth <= 0) return; 
                 
                 if (track.scrollLeft > setWidth * 2.5) {
@@ -744,9 +929,8 @@
                 }
             });
 
-            // Slightly increased timeout to ensure Tailwind CDN has applied styles
             setTimeout(() => {
-                const singleItemWidth = track.children.length > 1 ? Math.max(track.children[1].offsetLeft - track.children[0].offsetLeft, 300) : 300;
+                const singleItemWidth = track.children.length > 1 ? Math.max(track.children[1].offsetLeft - track.children[0].offsetLeft, 220) : 220;
                 track.style.scrollBehavior = 'auto';
                 track.scrollLeft = (items.length * 2) * singleItemWidth; 
                 requestAnimationFrame(() => track.style.scrollBehavior = 'smooth');
@@ -760,22 +944,27 @@
             track.scrollBy({ left: direction * cardWidthWithGap, behavior: 'smooth' });
         }
 
-        // --- INIT LISTS ---
-        function renderBestSellers() {
-            const container = document.getElementById('list-bestsellers');
+        function renderGrid(categoryId) {
+            const container = document.getElementById(`grid-${categoryId}`);
             let html = '';
-            bestSellersIds.forEach((id, idx) => {
-                const p = allProducts.find(x => x.id === id);
-                if (p) html += generateListItemHTML(p, idx === bestSellersIds.length - 1);
-            });
+            menuData[categoryId].forEach(p => { html += generateGridItemHTML(p); });
             container.innerHTML = html;
         }
 
-        function renderBeverages() {
-            const container = document.getElementById('list-beverages');
+        function renderList(categoryId) {
+            const container = document.getElementById(`list-${categoryId}`);
             let html = '';
-            menuData.beverages.forEach((p, idx) => {
-                html += generateListItemHTML(p, idx === menuData.beverages.length - 1);
+            const items = menuData[categoryId];
+            items.forEach((p, idx) => { html += generateListItemHTML(p, idx === items.length - 1); });
+            container.innerHTML = html;
+        }
+
+        function renderSignature() {
+            const container = document.getElementById('list-signature');
+            let html = '';
+            signatureIds.forEach((id) => {
+                const p = allProducts.find(x => x.id === id);
+                if (p) html += generateGridItemHTML(p);
             });
             container.innerHTML = html;
         }
@@ -783,43 +972,169 @@
         function openViewAll(categoryId) {
             const modal = document.getElementById('view-all-modal');
             const grid = document.getElementById('modal-grid');
-            document.getElementById('modal-title').textContent = `All ${categoryId}`;
+            const cat = categoryConfig.find(c => c.id === categoryId);
+            document.getElementById('modal-title').textContent = cat ? cat.title : 'Collection';
             
-            grid.innerHTML = menuData[categoryId].map(p => `
-                <div class="menu-card bg-surfaceLight border border-white/5 p-4 rounded-xl relative group flex flex-col h-[350px] shadow-lg">
-                    <div class="h-40 overflow-hidden mb-4 relative rounded-lg shrink-0">
-                        <img src="${p.img}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1 flex flex-col justify-between">
-                        <h3 class="font-serif text-[16px] text-white group-hover:text-gold-400 transition-colors line-clamp-2 mb-2">${p.name}</h3>
-                        <div class="flex justify-between items-center mt-auto pt-3 border-t border-white/5">
-                            <span class="text-gold-400 font-bold">Rs. ${p.price}</span>
-                            <div class="cart-btn-wrapper flex justify-end" data-id="${p.id}"></div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            grid.innerHTML = menuData[categoryId].map(p => generateGridItemHTML(p)).join('');
             
             modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
             syncCartButtons(); 
         }
 
         function closeViewAll() {
             document.getElementById('view-all-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
 
-        // --- CART LOGIC ---
+        // --- PRODUCT DETAILS MODAL ---
+        let activeModalProductId = null;
+        let modalExtras = { cheese: 0, sauce: 0 };
+        let activeModalBasePrice = 0;
+
+        function openProductModal(productId, event) {
+            if(event) event.stopPropagation();
+            activeModalProductId = productId;
+            modalExtras = { cheese: 0, sauce: 0 };
+            modalQty = 1; // reset qty when opening
+            
+            const product = allProducts.find(p => p.id === productId);
+            if(!product) return;
+
+            activeModalBasePrice = product.price;
+
+            document.getElementById('pm-img').src = product.img;
+            document.getElementById('pm-title').textContent = product.name;
+            document.getElementById('pm-desc').textContent = product.desc || '';
+            document.getElementById('pm-price').textContent = product.price;
+
+            let group = '';
+            for (const cat of categoryConfig) {
+                if (menuData[cat.id]?.find(p => p.id === productId)) {
+                    group = cat.group; break;
+                }
+            }
+            
+            const extrasContainer = document.getElementById('pm-extras-container');
+            const cheeseRow = document.getElementById('pm-extra-cheese');
+            const sauceRow = document.getElementById('pm-extra-sauce');
+            
+            if (group === 'burger' || group === 'fries') {
+                extrasContainer.classList.remove('hidden');
+                cheeseRow.classList.remove('hidden');
+                sauceRow.classList.remove('hidden');
+            } else {
+                extrasContainer.classList.add('hidden');
+                cheeseRow.classList.add('hidden');
+                sauceRow.classList.add('hidden');
+            }
+
+            updateModalUI();
+
+            const modal = document.getElementById('product-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('product-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateModalExtra(type, delta) {
+            if (modalExtras[type] + delta >= 0) {
+                modalExtras[type] += delta;
+                updateModalUI();
+            }
+        }
+
+        let modalQty = 1;
+        function updateModalProductQty(delta) {
+            if (modalQty + delta >= 1) {
+                modalQty += delta;
+                updateModalUI();
+            }
+        }
+
+        function updateModalUI() {
+            document.getElementById('pm-qty-cheese').textContent = modalExtras.cheese;
+            document.getElementById('pm-qty-sauce').textContent = modalExtras.sauce;
+            if(document.getElementById('pm-qty')) {
+                document.getElementById('pm-qty').textContent = modalQty;
+            }
+            
+            let baseWithExtras = activeModalBasePrice + (modalExtras.cheese * 70) + (modalExtras.sauce * 100);
+            let total = baseWithExtras * modalQty;
+            document.getElementById('pm-total').textContent = `Rs. ${total}`;
+        }
+
+        function confirmModalAdd(event) {
+            const product = allProducts.find(p => p.id === activeModalProductId);
+            if(product) {
+                const selectedExtras = [];
+                if(modalExtras.cheese > 0) {
+                    const ex = menuData.extras.find(e => e.id === 'ex_cheese');
+                    selectedExtras.push({ ...ex, qty: modalExtras.cheese });
+                }
+                if(modalExtras.sauce > 0) {
+                    const ex = menuData.extras.find(e => e.id === 'ex_sauce');
+                    selectedExtras.push({ ...ex, qty: modalExtras.sauce });
+                }
+
+                // Check if an item with EXACT same extras already exists
+                const existingIndex = cart.findIndex(item => {
+                    if (item.id !== activeModalProductId) return false;
+                    if (item.extras.length !== selectedExtras.length) return false;
+                    return selectedExtras.every(se => {
+                        const match = item.extras.find(ie => ie.id === se.id);
+                        return match && match.qty === se.qty;
+                    });
+                });
+
+                if (existingIndex > -1) {
+                    cart[existingIndex].qty += modalQty;
+                } else {
+                    cart.push({
+                        ...product,
+                        instanceId: 'inst_' + Date.now() + Math.random(), 
+                        qty: modalQty,
+                        extras: selectedExtras
+                    });
+                }
+                
+                spawnParticle(event, '+1');
+                updateCartUI();
+            }
+            closeProductModal();
+        }
+
+        // Removed addDirectToCart since extras are now nested
+
+        // --- DIRECT ADD TO CART ---
         function addToCart(productId, event) {
+            if(event) event.stopPropagation();
             const product = allProducts.find(p => p.id === productId);
             if(product) {
-                cart.push({ ...product, qty: 1 });
+                const itemIndex = cart.findIndex(item => item.id === productId && item.extras.length === 0);
+                if (itemIndex > -1) {
+                    cart[itemIndex].qty += 1;
+                } else {
+                    cart.push({ 
+                        ...product, 
+                        instanceId: 'inst_' + Date.now() + Math.random(),
+                        qty: 1, 
+                        extras: [] 
+                    });
+                }
                 spawnParticle(event, '+1');
             }
             updateCartUI();
         }
 
-        function updateQuantity(productId, delta, event) {
-            const itemIndex = cart.findIndex(item => item.id === productId);
+        function updateQuantity(instanceId, delta, event) {
+            if(event) event.stopPropagation();
+            const itemIndex = cart.findIndex(item => item.instanceId === instanceId);
             if (itemIndex > -1) {
                 cart[itemIndex].qty += delta;
                 spawnParticle(event, delta > 0 ? '+1' : '-1');
@@ -841,9 +1156,9 @@
 
             if (cart.length === 0) {
                 container.innerHTML = `
-                    <div class="h-full flex flex-col items-center justify-center text-gray-500 space-y-4 pt-20">
-                        <svg width="60" height="60" viewBox="0 0 256 256" class="opacity-20"><path fill="currentColor" d="M216 64h-40v-8a48 48 0 0 0-96 0v8H40a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16Zm-120-8a32 32 0 0 1 64 0v8H96Zm120 152H40V80h176v128Z"/></svg>
-                        <p class="text-sm uppercase tracking-widest">Your order is empty.</p>
+                    <div class="h-full flex flex-col items-center justify-center text-gray-400 space-y-4 pt-20">
+                        <svg width="50" height="50" viewBox="0 0 256 256" class="opacity-30"><path fill="currentColor" d="M216 64h-40v-8a48 48 0 0 0-96 0v8H40a16 16 0 0 0-16 16v128a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16Zm-120-8a32 32 0 0 1 64 0v8H96Zm120 152H40V80h176v128Z"/></svg>
+                        <p class="text-xs uppercase tracking-widest font-bold">Your order is empty.</p>
                     </div>
                 `;
                 totalEl.textContent = "Rs. 0";
@@ -854,29 +1169,47 @@
                 container.innerHTML = '';
 
                 cart.forEach(item => {
-                    const itemTotal = item.price * item.qty;
-                    total += itemTotal;
+                    let itemBaseTotal = item.price * item.qty;
+                    let extrasTotal = item.extras.reduce((sum, ex) => sum + (ex.price * ex.qty * item.qty), 0);
+                    let rowTotal = itemBaseTotal + extrasTotal;
+                    total += rowTotal;
+
+                    let extrasHtml = '';
+                    if (item.extras.length > 0) {
+                        extrasHtml = `
+                            <div class="mt-2 ml-4 border-l-2 border-gold-200 pl-3 space-y-1">
+                                ${item.extras.map(ex => `
+                                    <div class="text-[10px] md:text-xs text-gray-500 flex justify-between items-center">
+                                        <span>• ${ex.qty}x ${ex.name} (+Rs. ${ex.price * ex.qty})</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
 
                     container.innerHTML += `
-                        <div class="flex gap-4 items-center bg-surfaceLight p-3 rounded-lg border border-white/5">
-                            <img src="${item.img}" class="w-16 h-16 object-cover rounded-md">
-                            <div class="flex-1">
-                                <h4 class="text-white font-serif text-sm leading-tight">${item.name}</h4>
-                                <div class="text-gold-400 text-sm mt-1 font-bold">Rs. ${item.price}</div>
-                                
-                                <div class="flex items-center gap-3 mt-3">
-                                    <button onclick="updateQuantity('${item.id}', -1, event)" class="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-colors active:scale-90">
-                                        <svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg>
-                                    </button>
-                                    <span class="text-sm w-4 text-center text-white">${item.qty}</span>
-                                    <button onclick="updateQuantity('${item.id}', 1, event)" class="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-colors active:scale-90">
-                                        <svg width="12" height="12" viewBox="0 0 256 256"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
-                                    </button>
+                        <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="flex gap-3 items-center">
+                                <img src="${item.img}" class="w-14 h-14 object-cover rounded-md border border-gray-100">
+                                <div class="flex-1">
+                                    <h4 class="text-gray-900 font-serif text-sm font-bold leading-tight line-clamp-1">${item.name}</h4>
+                                    <div class="text-gold-600 text-xs mt-0.5 font-bold">Rs. ${item.price}</div>
+                                    
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <button onclick="updateQuantity('${item.instanceId}', -1, event)" class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors active:scale-90">
+                                            <svg width="10" height="10" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M216 136H40a8 8 0 0 1 0-16h176a8 8 0 0 1 0 16Z"/></svg>
+                                        </button>
+                                        <span class="text-xs w-4 text-center text-gray-900 font-bold">${item.qty}</span>
+                                        <button onclick="updateQuantity('${item.instanceId}', 1, event)" class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors active:scale-90">
+                                            <svg width="10" height="10" viewBox="0 0 256 256" class="pointer-events-none"><path fill="currentColor" d="M216 120h-80V40a8 8 0 0 0-16 0v80H40a8 8 0 0 0 0 16h80v80a8 8 0 0 0 16 0v-80h80a8 8 0 0 0 0-16Z"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-gray-900 font-bold text-sm">Rs. ${rowTotal}</div>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-white font-semibold text-sm">Rs. ${itemTotal}</div>
-                            </div>
+                            ${extrasHtml}
                         </div>
                     `;
                 });
@@ -899,6 +1232,8 @@
             const backdrop = document.getElementById('cart-backdrop');
             drawer.classList.toggle('active');
             backdrop.classList.toggle('active');
+            if(drawer.classList.contains('active')) document.body.style.overflow = 'hidden';
+            else document.body.style.overflow = 'auto';
         }
 
         function checkoutWhatsApp() {
@@ -914,9 +1249,15 @@
             let total = 0;
 
             cart.forEach(item => {
-                const itemTotal = item.price * item.qty;
-                total += itemTotal;
-                message += `▪ *${item.qty}x* ${item.name} - Rs. ${itemTotal}\n`;
+                let itemBaseTotal = item.price * item.qty;
+                let extrasTotal = item.extras.reduce((sum, ex) => sum + (ex.price * ex.qty * item.qty), 0);
+                let rowTotal = itemBaseTotal + extrasTotal;
+                total += rowTotal;
+
+                message += `🍔 *${item.qty}x ${item.name}* - Rs. ${itemBaseTotal}\n`;
+                item.extras.forEach(ex => {
+                    message += `  └─ ${ex.qty * item.qty}x ${ex.name} (+Rs. ${ex.price * ex.qty * item.qty})\n`;
+                });
             });
 
             if (orderType === 'delivery') {
@@ -937,23 +1278,25 @@
 
         function handleScroll() {
             const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) nav.classList.add('nav-scrolled', 'py-2'), nav.classList.remove('py-4');
+            if (window.scrollY > 30) nav.classList.add('nav-scrolled', 'py-2'), nav.classList.remove('py-4');
             else nav.classList.remove('nav-scrolled', 'py-2'), nav.classList.add('py-4');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             initTimerAndCurtains();
-            renderBestSellers();
-            initNativeCarousel('burgers');
-            initNativeCarousel('sides');
-            renderBeverages();
+            startHeroAutoRotate();
+            
+            // Initialize Dynamic Content Engine
+            renderCategoryNav();
+            renderAllCategories();
+            renderSignature();
             syncCartButtons();
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
             }, { threshold: 0.1 });
-            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
             
+            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
             window.addEventListener('scroll', handleScroll);
         });
 
